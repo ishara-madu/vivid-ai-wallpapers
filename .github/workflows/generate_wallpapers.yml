@@ -1,0 +1,80 @@
+name: Auto-Generate AI Wallpapers
+
+on:
+  schedule:
+    # Runs twice a day: at 00:00 UTC and 12:00 UTC (12 hours apart)
+    - cron: '0 0,12 * * *'
+  
+  # Allows manual triggering from the Actions tab
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of wallpapers to generate'
+        required: false
+        default: '2'
+        type: string
+      category:
+        description: 'Category filter'
+        required: false
+        default: 'random'
+        type: choice
+        options:
+          - random
+          - AMOLED
+          - Vibrant Flows
+          - Abstract
+          - Landscapes
+          - Minimal
+          - 3D
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'scripts/requirements.txt'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+
+      - name: Run AI Wallpaper Generator
+        env:
+          AI_IMAGE_API_KEY: ${{ secrets.AI_IMAGE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          WALLPAPERS_COUNT: ${{ inputs.count || '2' }}
+        run: |
+          python scripts/generate_wallpapers.py --count "${{ inputs.count || '2' }}" --category "${{ inputs.category || 'random' }}"
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Stage new wallpapers, thumbnails, and metadata
+          git add wallpapers/
+          
+          # Check if there are any changes to commit
+          if git diff --staged --quiet; then
+            echo "No new wallpapers were generated to commit."
+          else
+            git commit -m "🎨 Auto-generate AI wallpapers [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi

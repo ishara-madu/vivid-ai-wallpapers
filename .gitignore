@@ -1,0 +1,55 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+.venv
+venv/
+ENV/
+
+# Flutter / Dart
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/vivid_ai_wallpapers/build/
+/vivid_ai_wallpapers/.dart_tool/
+/vivid_ai_wallpapers/android/.gradle/
+/vivid_ai_wallpapers/android/local.properties
+/vivid_ai_wallpapers/android/app/debug
+/vivid_ai_wallpapers/android/app/profile
+/vivid_ai_wallpapers/android/app/release
+
+# IDEs
+.idea/
+*.iml
+.vscode/

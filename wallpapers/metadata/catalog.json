@@ -1,0 +1,148 @@
+[
+  {
+    "id": "wp_20261011_141216_317",
+    "title": "Crystal Lattice Core",
+    "category": "3D",
+    "imageUrl": "wallpapers/categories/3d/wp_20261011_141216_317.png",
+    "thumbnailUrl": "wallpapers/thumbnails/wp_20261011_141216_317.png",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#1E1B4B",
+      "#38BDF8"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "1080 x 2400",
+    "uploadDate": "October 11, 2026",
+    "description": "Floating crystalline cube revealing an internal neon pulse with optic light refractions.",
+    "views": 539,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine Procedural"
+  },
+  {
+    "id": "w1",
+    "title": "Solitary Lighthouse",
+    "category": "Landscapes",
+    "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80",
+    "isMultivariant": true,
+    "variants": [
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80",
+      "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1080&q=80",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1080&q=80"
+    ],
+    "gradientFallback": [
+      "#C7D3E8",
+      "#E5B5B5"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "2160 x 3840",
+    "uploadDate": "October 9, 2026",
+    "description": "A peaceful coastal scene featuring a lone lighthouse overlooking tranquil pastel waters at dusk.",
+    "views": 3420,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine v3.4"
+  },
+  {
+    "id": "w2",
+    "title": "Molten Fluid Flow",
+    "category": "Vibrant Flows",
+    "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1080&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#6B112D",
+      "#221142",
+      "#FF523B"
+    ],
+    "resolution": "8K Ultra HD",
+    "dimensions": "4320 x 7680",
+    "uploadDate": "October 8, 2026",
+    "description": "Rich velvety fluid waves flowing with intense purple and volcanic coral tones.",
+    "views": 8940,
+    "isLiked": true,
+    "aiEngine": "Vivid AI Engine v3.4"
+  },
+  {
+    "id": "w3",
+    "title": "Spiral Origami Silk",
+    "category": "3D",
+    "imageUrl": "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1080&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#FF9E79",
+      "#FF5B94"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "2160 x 3840",
+    "uploadDate": "October 6, 2026",
+    "description": "Geometric paper ribbon folds with silky warm gradients and soft shadows.",
+    "views": 4520,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine v3.4"
+  },
+  {
+    "id": "w4",
+    "title": "Floating Glass Prisms",
+    "category": "Abstract",
+    "imageUrl": "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?auto=format&fit=crop&w=1080&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?auto=format&fit=crop&w=400&q=80",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#16082F",
+      "#0B192C"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "2160 x 3840",
+    "uploadDate": "October 5, 2026",
+    "description": "Transparent refractive optical glass prisms scattering chromatic light across deep black.",
+    "views": 6120,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine v3.4"
+  },
+  {
+    "id": "w5",
+    "title": "Deep Cosmos Abyss",
+    "category": "AMOLED",
+    "imageUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1080&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#000000",
+      "#180630",
+      "#00F5D4"
+    ],
+    "resolution": "8K Ultra HD",
+    "dimensions": "4320 x 7680",
+    "uploadDate": "October 4, 2026",
+    "description": "True-black OLED celestial abyss glowing with emerald dust and distant pulsing pulsars.",
+    "views": 9840,
+    "isLiked": true,
+    "aiEngine": "Vivid AI Engine v3.4"
+  },
+  {
+    "id": "w6",
+    "title": "Zen Arch Concrete",
+    "category": "Minimal",
+    "imageUrl": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#E8ECEF",
+      "#A0AAB2"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "2160 x 3840",
+    "uploadDate": "October 2, 2026",
+    "description": "Architectural brutalist archway in soft afternoon sun creating poetic geometry and calm shadows.",
+    "views": 3110,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine v3.4"
+  }
+]
