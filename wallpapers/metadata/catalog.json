@@ -1,5 +1,45 @@
 [
   {
+    "id": "wp_20261011_150527_180",
+    "title": "Zen Balance Stones",
+    "category": "Minimal",
+    "imageUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/categories/minimal/wp_20261011_150527_180.png",
+    "thumbnailUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/thumbnails/wp_20261011_150527_180.png",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#D5BDAF",
+      "#8E9775"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "1080 x 2400",
+    "uploadDate": "October 11, 2026",
+    "description": "Meditative balance of smooth stone and brass geometry suspended above gentle water ripples.",
+    "views": 285,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine Procedural"
+  },
+  {
+    "id": "wp_20261011_150527_510",
+    "title": "Chroma Nebula Silk",
+    "category": "Vibrant Flows",
+    "imageUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/categories/vibrant_flows/wp_20261011_150527_510.png",
+    "thumbnailUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/thumbnails/wp_20261011_150527_510.png",
+    "isMultivariant": false,
+    "variants": [],
+    "gradientFallback": [
+      "#632FE1",
+      "#FF685F"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "1080 x 2400",
+    "uploadDate": "October 11, 2026",
+    "description": "Rich molten silk folds floating weightlessly with velvety violet and coral gradients.",
+    "views": 849,
+    "isLiked": false,
+    "aiEngine": "Vivid AI Engine Procedural"
+  },
+  {
     "id": "wp_20261011_141216_317",
     "title": "Crystal Lattice Core",
     "category": "3D",
