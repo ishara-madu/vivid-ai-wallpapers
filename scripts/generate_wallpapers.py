@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Vivid AI Wallpapers - Automated Image Generation Worker
--------------------------------------------------------
-This script generates vertical 9:16 mobile wallpapers using AI image generation APIs
-(such as OpenAI DALL-E 3), processes them (thumbnail generation, dominant color extraction),
-and appends metadata into `wallpapers/metadata/catalog.json`.
+Vivid Notch AI - Automated Camera Cutout Wallpaper Generator
+------------------------------------------------------------
+This script generates vertical 9:16 mobile wallpapers designed specifically
+for camera cutouts (Center Hole-Punch, Dynamic Island Pill, Left Corner, and AMOLED Stealth).
 
 Supported Environment Variables:
   - AI_IMAGE_API_KEY or OPENAI_API_KEY: Secret API key for AI generation
@@ -49,113 +48,89 @@ THUMBNAILS_DIR = WALLPAPERS_DIR / "thumbnails"
 METADATA_DIR = WALLPAPERS_DIR / "metadata"
 CATALOG_PATH = METADATA_DIR / "catalog.json"
 
-# Curated Prompts across Categories for Mobile Vertical 9:16 Wallpapers
+# Cutout-Focused Prompts across Categories
 PROMPT_CATALOG = {
-    "AMOLED": [
+    "Center Hole": [
         {
-            "title": "Neon Quantum Bloom",
-            "prompt": "Vertical 9:16 mobile wallpaper. Deep pure OLED pitch black #000000 background. Bioluminescent futuristic alien flower with delicate glowing electric magenta and cyan petals. Volumetric soft rim light, macro lens focus, octane render, 8K ultra detail.",
-            "description": "True-black OLED dark canvas illuminated by bioluminescent quantum flora with vivid cyan and magenta petals.",
-            "colors": ["#000000", "#00F5D4"]
+            "title": "Cosmic Eclipse Halo",
+            "prompt": "Vertical 9:16 mobile wallpaper. Deep pure OLED pitch black #000000 background. At the very top-center (x: 50%, y: 5%), a stunning glowing solar eclipse corona with radiant golden and amber light rays orbiting an empty circular void for the camera punch hole. High contrast, clean, 8K ultra detail.",
+            "description": "Luminous golden solar corona orbiting the center camera punch-hole against an infinite AMOLED black void.",
+            "colors": ["#000000", "#FFB703"],
+            "cutoutType": "centerHole"
         },
         {
-            "title": "Obsidian Prism Wave",
-            "prompt": "Vertical 9:16 mobile wallpaper. Deep AMOLED black void background. A single sleek flowing ribbon made of reflective dark obsidian and neon emerald glass waves with subtle chromatic dispersion. Minimalist, modern, hyper-realistic, 8k.",
-            "description": "Fluid obsidian wave reflecting vibrant emerald neon light across a pure OLED canvas.",
-            "colors": ["#0A0A0E", "#00E599"]
-        },
-        {
-            "title": "Cyber Circuit Eclipse",
-            "prompt": "Vertical 9:16 mobile wallpaper. Pure deep black background. Elegant minimalist golden and electric blue circuitry radiating from a dark solar eclipse ring. High contrast, sharp geometric lines, premium aesthetic.",
-            "description": "Geometric golden circuits and electric halos orbiting a central eclipse on deep black.",
-            "colors": ["#05050A", "#FFB703"]
+            "title": "Cyber Optic HUD Ring",
+            "prompt": "Vertical 9:16 mobile wallpaper. Pure deep black background. At the top-center (x: 50%, y: 5%), a hyper-precise neon cyan and electric blue holographic HUD crosshair ring targeting the front camera lens. Minimalist geometric interface, 8K octane render.",
+            "description": "Futuristic sci-fi target lock aperture rotating symmetrically around the center camera lens.",
+            "colors": ["#0F172A", "#38BDF8"],
+            "cutoutType": "centerHole"
         }
     ],
-    "Vibrant Flows": [
+    "Dynamic Island": [
         {
-            "title": "Chroma Nebula Silk",
-            "prompt": "Vertical 9:16 mobile wallpaper. Lush flowing molten silk ribbons twisting in zero gravity. Rich chromatic gradients of deep royal purple, fiery coral orange, and electric fuchsia. Smooth satin textures, hyper-detailed fluid dynamics.",
-            "description": "Rich molten silk folds floating weightlessly with velvety violet and coral gradients.",
-            "colors": ["#632FE1", "#FF685F"]
+            "title": "Neon Island Wave",
+            "prompt": "Vertical 9:16 mobile wallpaper. Pitch black AMOLED background. At the top-center (x: 50%, y: 6%), an elegant glowing acoustic audio soundwave pill capsule tailored for Apple Dynamic Island. Vibrant gradient ribbons of magenta, violet, and electric coral flowing downward.",
+            "description": "Sleek acoustic soundwave pill engineered to hug the Dynamic Island with fluid magenta and volcanic coral gradients.",
+            "colors": ["#1A0B2E", "#FF523B"],
+            "cutoutType": "dynamicIsland"
         },
         {
-            "title": "Aurora Liquid Spiral",
-            "prompt": "Vertical 9:16 mobile wallpaper. Swirling spiral of viscous iridescent liquid glass. Saturated transitions from aqua mint to indigo and hot pink. Glossy reflections, macro fluid art, cinematic lighting.",
-            "description": "Viscous iridescent fluid spiral displaying a rich spectrum of aqua, indigo, and bright magenta.",
-            "colors": ["#1A0B2E", "#FF523B"]
-        },
-        {
-            "title": "Prismatic Thermal Wave",
-            "prompt": "Vertical 9:16 mobile wallpaper. Abstract kinetic wave of translucent liquid gradient ribbons. Saturated sunset gradient with luminous neon accents. Smooth curves, clean modern aesthetic, 8K.",
-            "description": "Kinetic fluid ribbons in warm twilight sunset tones with luminous neon edge highlights.",
-            "colors": ["#FF5B94", "#FFA07A"]
+            "title": "Chroma Cyber Visor",
+            "prompt": "Vertical 9:16 mobile wallpaper. Deep OLED black. At top-center (x: 50%, y: 6%), a sleek horizontal glowing neon pill visor reflecting molten purple and cyan holographic reflections.",
+            "description": "Cybernetic horizontal visor framing the Dynamic Island pill with saturated neon reflections.",
+            "colors": ["#0B081E", "#00F5D4"],
+            "cutoutType": "dynamicIsland"
         }
     ],
-    "Abstract": [
+    "Left Corner": [
         {
-            "title": "Refractive Glass Origami",
-            "prompt": "Vertical 9:16 mobile wallpaper. Translucent frosted optical glass geometric polyhedron sculptures floating against a clean dark dusk gradient. Light caustics and spectral dispersion prism effects. Elegant, minimalist, 3D render.",
-            "description": "Intricate optical glass geometric prisms refracting soft rainbow light across a moody studio.",
-            "colors": ["#16082F", "#0B192C"]
+            "title": "Corner Lightning Arc",
+            "prompt": "Vertical 9:16 mobile wallpaper. Deep pure OLED black void. Coiling electric emerald plasma arc bursting and arcing outwards from the top-left corner (x: 10%, y: 5%) where the camera hole punch is located. Intense glowing rim lighting, high contrast, clean.",
+            "description": "Coiling cyan electric plasma arc originating directly from the top-left camera hole punch.",
+            "colors": ["#0A0A0E", "#00E599"],
+            "cutoutType": "leftHole"
         },
         {
-            "title": "Ethereal Dimension Ribbons",
-            "prompt": "Vertical 9:16 mobile wallpaper. Curving architectural origami paper layers with soft diffused gradients of terracotta, lavender, and champagne cream. Minimalist geometric rhythm, soft directional shadows.",
-            "description": "Layered architectural ribbons weaving calm geometric harmony in soft pastel tones.",
-            "colors": ["#D8C4B6", "#4F709C"]
+            "title": "Corner Starburst Nova",
+            "prompt": "Vertical 9:16 mobile wallpaper. Pure black AMOLED background. Brilliant miniature supernova starburst detonating in the top-left corner (x: 10%, y: 5%) with subtle prismatic light refractions.",
+            "description": "Miniature celestial supernova burst exploding from the top-left camera cutout.",
+            "colors": ["#000000", "#FF685F"],
+            "cutoutType": "leftHole"
         }
     ],
-    "Landscapes": [
+    "Creative Cutouts": [
         {
-            "title": "Pastel Twilight Peak",
-            "prompt": "Vertical 9:16 mobile wallpaper. Dreamlike minimalist mountain summit bathed in soft pastel twilight sunset. Gentle sea of clouds in valleys below, lone silhouette pine tree, subtle glowing crescent moon. Atmospheric perspective, cinematic peaceful.",
-            "description": "A tranquil alpine summit rising above pastel twilight mist under a quiet crescent moon.",
-            "colors": ["#C7D3E8", "#E5B5B5"]
+            "title": "Astronaut Starlight Reach",
+            "prompt": "Vertical 9:16 mobile wallpaper. Pure deep OLED black canvas. A lone minimalist astronaut floating in zero gravity from the bottom-left, reaching up with a glowing glove toward the camera cutout at the top-center. Ethereal, poetic, clean negative space, 8K.",
+            "description": "Minimalist astronaut floating on pitch-black canvas reaching out to illuminate the front camera lens.",
+            "colors": ["#000000", "#632FE1"],
+            "cutoutType": "centerHole"
         },
         {
-            "title": "Solitary Dune Horizon",
-            "prompt": "Vertical 9:16 mobile wallpaper. Elegant sweeping desert sand dunes sculpted by wind under a deep violet star-filled sky. Golden hour warm glow on the dune ridge contrasting with cool indigo shadows. Ethereal, meditative.",
-            "description": "Sculpted desert dune ridge bathed in warm golden rim-light under a twilight sky.",
-            "colors": ["#2C1A4D", "#F4A261"]
+            "title": "Cat on the Bezel",
+            "prompt": "Vertical 9:16 mobile wallpaper. Deep black background. Adorable playful black cat silhouette hanging from the top edge with luminous emerald eyes gazing down at the camera punch hole. Minimalist, charming, crisp lines.",
+            "description": "Charming black cat silhouette dangling with playful curiosity directly above the punch hole.",
+            "colors": ["#000000", "#FF685F"],
+            "cutoutType": "centerHole"
         }
     ],
-    "Minimal": [
+    "AMOLED Stealth": [
         {
-            "title": "Bauhaus Concrete Arch",
-            "prompt": "Vertical 9:16 mobile wallpaper. Minimalist brutalist architectural arch with warm natural sunlight casting a poetic diagonal geometric shadow. Clean monochrome stone texture with a subtle sphere of warm terracotta. High negative space, serene.",
-            "description": "Calm architectural geometry celebrating natural afternoon light and clean negative space.",
-            "colors": ["#E8ECEF", "#A0AAB2"]
-        },
-        {
-            "title": "Zen Balance Stones",
-            "prompt": "Vertical 9:16 mobile wallpaper. Perfectly balanced smooth river stones and a brass ring hovering above a calm water ripple. Soft warm studio lighting, subtle muted sage green and beige tones. Clean, meditative, premium.",
-            "description": "Meditative balance of smooth stone and brass geometry suspended above gentle water ripples.",
-            "colors": ["#D5BDAF", "#8E9775"]
-        }
-    ],
-    "3D": [
-        {
-            "title": "Floating Chrome Orb Array",
-            "prompt": "Vertical 9:16 mobile wallpaper. Hyper-realistic 3D ray-traced scene with liquid mercury chrome spheres and frosted matte blush polygons floating in an infinite minimalist studio. Soft studio softbox reflections, subtle depth of field.",
-            "description": "Precision 3D composition with liquid chrome spheres and frosted geometric sculptures.",
-            "colors": ["#E2E8F0", "#64748B"]
-        },
-        {
-            "title": "Crystal Lattice Core",
-            "prompt": "Vertical 9:16 mobile wallpaper. Transparent floating crystal lattice cube with an internal glowing neon core. Prismatic refraction, caustic reflections on subtle slate backdrop. Clean high-tech aesthetic.",
-            "description": "Floating crystalline cube revealing an internal neon pulse with optic light refractions.",
-            "colors": ["#1E1B4B", "#38BDF8"]
+            "title": "Obsidian Stealth Abyss",
+            "prompt": "Vertical 9:16 mobile wallpaper. Upper 25% of the screen is pure solid #000000 pitch black. Slowly transitioning downwards into magnificent smooth molten violet and midnight silk flows. Zero notch visibility, maximum battery savings, ultra clean.",
+            "description": "Seamless top-fade into absolute #000000 pure black, making any notch, pill, or hole-punch completely invisible.",
+            "colors": ["#000000", "#1E1B4B"],
+            "cutoutType": "universal"
         }
     ]
 }
 
 CATEGORY_FOLDERS = {
-    "AMOLED": "categories/amoled",
-    "Vibrant Flows": "categories/vibrant_flows",
-    "Abstract": "categories/abstract",
-    "Landscapes": "categories/landscapes",
-    "Minimal": "categories/minimal",
-    "3D": "categories/3d"
+    "Center Hole": "categories/center_hole",
+    "Dynamic Island": "categories/dynamic_island",
+    "Left Corner": "categories/left_corner",
+    "Creative Cutouts": "categories/creative_cutouts",
+    "AMOLED Stealth": "categories/amoled_stealth",
 }
 
 
@@ -245,16 +220,13 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
     repo = os.environ.get("GITHUB_REPOSITORY", "").strip()
 
     print("=" * 60)
-    print(" Vivid AI Wallpapers - Automated Image Generator")
+    print(" Vivid Notch AI - Automated Camera Cutout Generator")
     print(f" Target Count: {count}")
     print(f" Category:     {target_category}")
     print(f" Provider:     {provider}")
     print(f" Repository:   {repo if repo else '(local execution)'}")
-    print(f" PIL available: {HAS_PIL}")
-    print(f" Requests:     {HAS_REQUESTS}")
     print("=" * 60)
 
-    # Check API key
     is_live_api = bool(api_key and len(api_key) > 10 and not api_key.startswith("your_"))
     if not is_live_api:
         print("\n[NOTE] AI_IMAGE_API_KEY is not configured or in placeholder mode.")
@@ -286,7 +258,6 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
         cat = target_category if target_category in PROMPT_CATALOG else random.choice(categories_list)
         prompt_info = random.choice(PROMPT_CATALOG[cat])
 
-        # Unique timestamped ID
         timestamp_str = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         uid = f"wp_{timestamp_str}_{random.randint(100, 999)}"
         while uid in existing_ids:
@@ -296,8 +267,9 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
         title = prompt_info["title"]
         prompt_text = prompt_info["prompt"]
         desc = prompt_info["description"]
-        fallback_colors = prompt_info.get("colors", ["#632FE1", "#FF685F"])
-        category_folder = CATEGORY_FOLDERS.get(cat, "categories/abstract")
+        cutout_type = prompt_info.get("cutoutType", "centerHole")
+        fallback_colors = prompt_info.get("colors", ["#000000", "#FFB703"])
+        category_folder = CATEGORY_FOLDERS.get(cat, "categories/center_hole")
 
         filename = f"{uid}.png"
         thumb_filename = f"{uid}.png"
@@ -336,7 +308,6 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
                 thumb_filename = f"{uid}.webp"
                 print(f"Saved WebP thumbnail: {thumb_webp_path.relative_to(REPO_ROOT)}")
             except Exception as e:
-                print(f"Thumbnail notice: {e}, writing PNG thumbnail")
                 with open(thumb_img_path, "wb") as f:
                     f.write(img_bytes)
         else:
@@ -359,10 +330,12 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
             "id": uid,
             "title": title,
             "category": cat,
+            "cutoutType": cutout_type,
             "imageUrl": image_url,
             "thumbnailUrl": thumb_url,
             "isMultivariant": False,
             "variants": [],
+            "cutoutVariants": {},
             "gradientFallback": fallback_colors,
             "resolution": "4K Ultra HD",
             "dimensions": "1080 x 2400",
@@ -370,7 +343,7 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
             "description": desc,
             "views": random.randint(120, 950),
             "isLiked": False,
-            "aiEngine": "DALL-E 3 / Vivid AI Engine" if is_live_api else "Vivid AI Engine Procedural"
+            "aiEngine": "DALL-E 3 / Vivid Notch AI" if is_live_api else "Vivid Notch Procedural"
         }
 
         new_entries.append(new_entry)
@@ -383,13 +356,13 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
         json.dump(updated_catalog, f, indent=2, ensure_ascii=False)
 
     print("\n" + "=" * 60)
-    print(f" Done! Added {len(new_entries)} new wallpapers to catalog.json.")
+    print(f" Done! Added {len(new_entries)} new cutout wallpapers to catalog.json.")
     print(f" Total wallpapers in catalog: {len(updated_catalog)}")
     print("=" * 60)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate AI Wallpapers for Vivid AI")
+    parser = argparse.ArgumentParser(description="Generate Cutout Wallpapers for Vivid Notch AI")
     parser.add_argument("--count", type=int, default=int(os.environ.get("WALLPAPERS_COUNT", "2")),
                         help="Number of wallpapers to generate (default: 2)")
     parser.add_argument("--category", type=str, default="random",

@@ -1,5 +1,27 @@
 [
   {
+    "id": "wp_20261011_155500_667",
+    "title": "Astronaut Starlight Reach",
+    "category": "Creative Cutouts",
+    "cutoutType": "centerHole",
+    "imageUrl": "wallpapers/categories/creative_cutouts/wp_20261011_155500_667.png",
+    "thumbnailUrl": "wallpapers/thumbnails/wp_20261011_155500_667.png",
+    "isMultivariant": false,
+    "variants": [],
+    "cutoutVariants": {},
+    "gradientFallback": [
+      "#000000",
+      "#632FE1"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "1080 x 2400",
+    "uploadDate": "October 11, 2026",
+    "description": "Minimalist astronaut floating on pitch-black canvas reaching out to illuminate the front camera lens.",
+    "views": 178,
+    "isLiked": false,
+    "aiEngine": "Vivid Notch Procedural"
+  },
+  {
     "id": "wp_20261011_150527_180",
     "title": "Zen Balance Stones",
     "category": "Minimal",

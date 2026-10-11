@@ -1,38 +1,32 @@
 [
   {
-    "id": "amoled",
-    "name": "AMOLED",
-    "description": "True-black battery-saving masterworks with vivid neon luminescence",
-    "folder": "categories/amoled"
+    "id": "center_hole",
+    "name": "Center Hole",
+    "description": "Customized for center punch-hole cameras (Samsung Galaxy, Xiaomi, Pixel, Nothing)",
+    "folder": "categories/center_hole"
   },
   {
-    "id": "vibrant_flows",
-    "name": "Vibrant Flows",
-    "description": "Molten chromatic fluidity, silky ribbons, and rich gradient transitions",
-    "folder": "categories/vibrant_flows"
+    "id": "dynamic_island",
+    "name": "Dynamic Island",
+    "description": "Engineered for capsule and pill cutouts (iPhone 14-16 Pro, Honor Magic Pill)",
+    "folder": "categories/dynamic_island"
   },
   {
-    "id": "abstract",
-    "name": "Abstract",
-    "description": "Geometric origami, prismatic light refractions, and dreamlike forms",
-    "folder": "categories/abstract"
+    "id": "left_corner",
+    "name": "Left Corner",
+    "description": "Designed for top-left hole-punch cameras (OnePlus, Realme, older Galaxy)",
+    "folder": "categories/left_corner"
   },
   {
-    "id": "landscapes",
-    "name": "Landscapes",
-    "description": "Serene AI-imagined vistas, misty twilight summits, and pastel horizons",
-    "folder": "categories/landscapes"
+    "id": "creative_cutouts",
+    "name": "Creative Cutouts",
+    "description": "Playful and artistic character interactions orbiting your phone camera",
+    "folder": "categories/creative_cutouts"
   },
   {
-    "id": "minimal",
-    "name": "Minimal",
-    "description": "Calm negative space, subtle textures, and clean architectural lines",
-    "folder": "categories/minimal"
-  },
-  {
-    "id": "3d",
-    "name": "3D",
-    "description": "Hyper-realistic raytraced spatial geometries and glass sculptures",
-    "folder": "categories/3d"
+    "id": "amoled_stealth",
+    "name": "AMOLED Stealth",
+    "description": "Deep #000000 true black fade seamlessly camouflaging any notch or cutout",
+    "folder": "categories/amoled_stealth"
   }
 ]
