@@ -252,25 +252,5 @@
     "views": 9840,
     "isLiked": true,
     "aiEngine": "Vivid AI Engine v3.4"
-  },
-  {
-    "id": "w6",
-    "title": "Zen Arch Concrete",
-    "category": "Minimal",
-    "imageUrl": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1080&q=80",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80",
-    "isMultivariant": false,
-    "variants": [],
-    "gradientFallback": [
-      "#E8ECEF",
-      "#A0AAB2"
-    ],
-    "resolution": "4K Ultra HD",
-    "dimensions": "2160 x 3840",
-    "uploadDate": "October 2, 2026",
-    "description": "Architectural brutalist archway in soft afternoon sun creating poetic geometry and calm shadows.",
-    "views": 3110,
-    "isLiked": false,
-    "aiEngine": "Vivid AI Engine v3.4"
   }
 ]
