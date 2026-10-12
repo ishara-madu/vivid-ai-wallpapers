@@ -14,18 +14,17 @@ on:
         default: '2'
         type: string
       category:
-        description: 'Category filter'
+        description: 'Cutout Category filter'
         required: false
         default: 'random'
         type: choice
         options:
           - random
-          - AMOLED
-          - Vibrant Flows
-          - Abstract
-          - Landscapes
-          - Minimal
-          - 3D
+          - 'Center Hole'
+          - 'Dynamic Island'
+          - 'Left Corner'
+          - 'Creative Cutouts'
+          - 'AMOLED Stealth'
 
 permissions:
   contents: write
@@ -55,9 +54,11 @@ jobs:
 
       - name: Run AI Wallpaper Generator
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
           AI_IMAGE_API_KEY: ${{ secrets.AI_IMAGE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           WALLPAPERS_COUNT: ${{ inputs.count || '2' }}
         run: |

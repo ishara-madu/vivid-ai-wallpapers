@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Vivid Notch AI - Automated Camera Cutout Wallpaper Generator
+Vivid Notch AI - Two-Stage Automated AI Wallpaper Generator
 ------------------------------------------------------------
-This script generates vertical 9:16 mobile wallpapers designed specifically
-for camera cutouts (Center Hole-Punch, Dynamic Island Pill, Left Corner, and AMOLED Stealth).
+Stage 1 (Brain): Google Gemini 1.5 Flash (Free Tier)
+  - Dynamically synthesizes creative concepts, catchy titles,
+    poetic descriptions, and precision camera-cutout prompts.
+
+Stage 2 (Painter): Hugging Face Inference API (FLUX.1-schnell / SDXL) (Free Tier)
+  - Renders vertical 9:16 Ultra HD AMOLED masterworks.
 
 Supported Environment Variables:
-  - AI_IMAGE_API_KEY or OPENAI_API_KEY: Secret API key for AI generation
-  - AI_PROVIDER: 'openai' (default), 'stability', or 'mock'
+  - GEMINI_API_KEY: Google AI Studio API Key (Free tier at aistudio.google.com)
+  - HF_TOKEN / HUGGINGFACE_API_KEY: Hugging Face user token (Free at huggingface.co)
   - GITHUB_REPOSITORY: e.g. 'username/vivid-ai-wallpapers' (used to generate raw URLs)
   - WALLPAPERS_COUNT: Number of wallpapers to generate per execution (default: 2)
 """
@@ -20,6 +24,7 @@ import zlib
 import struct
 import random
 import argparse
+import urllib.parse
 import urllib.request
 import urllib.error
 from datetime import datetime
@@ -48,7 +53,7 @@ THUMBNAILS_DIR = WALLPAPERS_DIR / "thumbnails"
 METADATA_DIR = WALLPAPERS_DIR / "metadata"
 CATALOG_PATH = METADATA_DIR / "catalog.json"
 
-# Cutout-Focused Prompts across Categories
+# Curated Fallback Prompts (used if GEMINI_API_KEY is not provided)
 PROMPT_CATALOG = {
     "Center Hole": [
         {
@@ -133,6 +138,54 @@ CATEGORY_FOLDERS = {
     "AMOLED Stealth": "categories/amoled_stealth",
 }
 
+CUTOUT_TYPE_MAP = {
+    "Center Hole": "centerHole",
+    "Dynamic Island": "dynamicIsland",
+    "Left Corner": "leftHole",
+    "Creative Cutouts": "centerHole",
+    "AMOLED Stealth": "universal",
+}
+
+
+def http_post_json(url: str, headers: dict, payload: dict, timeout: int = 60) -> dict:
+    """Perform HTTP POST with requests or urllib."""
+    data_bytes = json.dumps(payload).encode("utf-8")
+    if HAS_REQUESTS:
+        resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+        if resp.status_code != 200:
+            raise RuntimeError(f"HTTP Error {resp.status_code}: {resp.text}")
+        return resp.json()
+    else:
+        req = urllib.request.Request(url, data=data_bytes, headers=headers, method="POST")
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            return json.loads(response.read().decode("utf-8"))
+
+
+def http_post_binary(url: str, headers: dict, payload: dict, timeout: int = 90) -> bytes:
+    """Perform HTTP POST expecting binary response (image bytes)."""
+    data_bytes = json.dumps(payload).encode("utf-8")
+    if HAS_REQUESTS:
+        resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+        if resp.status_code != 200:
+            raise RuntimeError(f"HTTP Error {resp.status_code}: {resp.text}")
+        return resp.content
+    else:
+        req = urllib.request.Request(url, data=data_bytes, headers=headers, method="POST")
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            return response.read()
+
+
+def http_get_bytes(url: str, timeout: int = 60) -> bytes:
+    """Download binary data via HTTP with requests or urllib."""
+    if HAS_REQUESTS:
+        resp = requests.get(url, timeout=timeout)
+        if resp.status_code != 200:
+            raise RuntimeError(f"HTTP Download failed: {resp.status_code}")
+        return resp.content
+    else:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            return response.read()
+
 
 def create_pure_python_png(width: int, height: int, c1_hex: str, c2_hex: str) -> bytes:
     """Generate a valid, compressed PNG image using standard library without external dependencies."""
@@ -145,7 +198,7 @@ def create_pure_python_png(width: int, height: int, c1_hex: str, c2_hex: str) ->
 
     raw_data = bytearray()
     for y in range(height):
-        raw_data.append(0)  # Filter byte: None
+        raw_data.append(0)
         factor = y / height
         r = int(c1[0] * (1 - factor) + c2[0] * factor)
         g = int(c1[1] * (1 - factor) + c2[1] * factor)
@@ -166,72 +219,153 @@ def create_pure_python_png(width: int, height: int, c1_hex: str, c2_hex: str) ->
     return png_bytes
 
 
-def http_post_json(url: str, headers: dict, payload: dict) -> dict:
-    """Perform HTTP POST with requests or fallback to urllib."""
-    data_bytes = json.dumps(payload).encode("utf-8")
-    if HAS_REQUESTS:
-        resp = requests.post(url, headers=headers, json=payload, timeout=90)
-        if resp.status_code != 200:
-            raise RuntimeError(f"HTTP Error {resp.status_code}: {resp.text}")
-        return resp.json()
-    else:
-        req = urllib.request.Request(url, data=data_bytes, headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=90) as response:
-            return json.loads(response.read().decode("utf-8"))
+# ---------------------------------------------------------------------------
+# STAGE 1: Google Gemini API (Text Concept & Precision Prompt Generation)
+# ---------------------------------------------------------------------------
+
+def generate_concept_with_gemini(category: str, api_key: str) -> dict:
+    """
+    Uses Google Gemini 1.5 Flash (Free Tier) to generate a unique, creative
+    cutout concept, poetic description, and FLUX image prompt.
+    """
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+
+    cutout_hint = {
+        "Center Hole": "The physical front camera punch hole is at the TOP CENTER (x: 50%, y: 5%). Design an element that orbits, frames, or radiates from this center hole.",
+        "Dynamic Island": "The physical camera is a horizontal pill / capsule at TOP CENTER (x: 50%, y: 6%). Design glowing audio soundwaves, visors, or capsule flows framing the island.",
+        "Left Corner": "The physical camera hole punch is in the TOP-LEFT CORNER (x: 10%, y: 5%). Design lightning arcs, celestial bursts, or characters interacting from the top-left.",
+        "Creative Cutouts": "Playful, surreal character interactions with the camera punch hole at TOP CENTER (e.g., astronaut, cat, robot, portal, dripping fluid).",
+        "AMOLED Stealth": "The top 20% of the wallpaper must be PURE SOLID #000000 true black to make any camera cutout completely invisible, transitioning into deep fluid or neon flows below.",
+    }.get(category, "Camera cutout at top center.")
+
+    prompt_instruction = f"""
+You are the master Art Director for 'Vivid Notch AI' - an elite mobile wallpaper app specializing in wallpapers tailored for smartphone camera punch holes and notches.
+
+Generate 1 brand new, stunning wallpaper concept for Category: '{category}'.
+Target Screen: 9:16 mobile aspect ratio (portrait).
+Cutout requirement: {cutout_hint}
+Aesthetic: Deep pure OLED pitch black #000000 canvas, vivid luminous accents (neon amber, cyan, violet, or coral), ultra-modern, elegant, minimalist.
+
+Respond ONLY with a valid JSON object matching this schema:
+{{
+  "title": "Short poetic title (2-4 words)",
+  "category": "{category}",
+  "cutoutType": "{CUTOUT_TYPE_MAP.get(category, 'centerHole')}",
+  "description": "Poetic 1-2 sentence description explaining how the artwork compliments the camera cutout and OLED screen.",
+  "prompt": "Ultra-detailed FLUX.1 / SDXL image generation prompt. Specify: 'Vertical 9:16 mobile wallpaper. Deep pure OLED pitch black #000000 background.' clearly describing the geometry, lighting, textures, and cutout interaction. Keep under 120 words.",
+  "colors": ["#000000", "#HEX_ACCENT_COLOR"]
+}}
+"""
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt_instruction}
+                ]
+            }
+        ],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.9
+        }
+    }
+
+    print(f"Calling Google Gemini 1.5 Flash to synthesize new '{category}' concept...")
+    result = http_post_json(url, headers, payload, timeout=30)
+    
+    # Parse candidate response
+    candidate_text = result["candidates"][0]["content"]["parts"][0]["text"]
+    concept_data = json.loads(candidate_text)
+    print(f"-> Gemini conceived: '{concept_data.get('title')}'")
+    return concept_data
 
 
-def http_get_bytes(url: str) -> bytes:
-    """Download binary data via HTTP with requests or urllib."""
-    if HAS_REQUESTS:
-        resp = requests.get(url, timeout=60)
-        if resp.status_code != 200:
-            raise RuntimeError(f"HTTP Download failed: {resp.status_code}")
-        return resp.content
-    else:
-        with urllib.request.urlopen(url, timeout=60) as response:
-            return response.read()
+# ---------------------------------------------------------------------------
+# STAGE 2: Hugging Face API / FLUX.1-schnell (Image Generation)
+# ---------------------------------------------------------------------------
 
+def generate_image_with_huggingface(prompt: str, hf_token: str) -> bytes:
+    """
+    Uses Hugging Face Serverless Inference API (Free Tier) to generate 
+    a vertical 9:16 wallpaper using FLUX.1-schnell or SDXL.
+    """
+    models = [
+        "black-forest-labs/FLUX.1-schnell",
+        "stabilityai/stable-diffusion-xl-base-1.0"
+    ]
 
-def generate_image_openai(prompt: str, api_key: str) -> bytes:
-    """Generate image using OpenAI DALL-E 3 API (returns raw PNG/JPEG image bytes)."""
-    url = "https://api.openai.com/v1/images/generations"
     headers = {
-        "Authorization": f"Bearer {api_key}",
+        "Authorization": f"Bearer {hf_token}",
         "Content-Type": "application/json"
     }
-    payload = {
-        "model": "dall-e-3",
-        "prompt": prompt,
-        "n": 1,
-        "size": "1024x1792",  # Vertical 9:16 mobile aspect ratio
-        "quality": "hd",
-        "style": "vivid"
-    }
 
-    print("Sending generation request to OpenAI DALL-E 3 (size 1024x1792)...")
-    data = http_post_json(url, headers, payload)
-    image_url = data["data"][0]["url"]
-    print("Image generated successfully. Downloading from CDN...")
-    return http_get_bytes(image_url)
+    for model in models:
+        url = f"https://api-inference.huggingface.co/models/{model}"
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "width": 768,
+                "height": 1344
+            }
+        }
+
+        print(f"Sending prompt to Hugging Face ({model})...")
+        for attempt in range(3):
+            try:
+                img_bytes = http_post_binary(url, headers, payload, timeout=90)
+                # Verify that response is binary image data, not a JSON error
+                if img_bytes.startswith(b"{"):
+                    err_json = json.loads(img_bytes.decode("utf-8", errors="ignore"))
+                    if "estimated_time" in err_json:
+                        wait_sec = min(int(err_json.get("estimated_time", 10)), 20)
+                        print(f"Model is loading, waiting {wait_sec}s (attempt {attempt+1}/3)...")
+                        time.sleep(wait_sec)
+                        continue
+                    else:
+                        raise RuntimeError(f"HF Error: {err_json}")
+                print(f"-> Image received successfully from {model} ({len(img_bytes)} bytes)")
+                return img_bytes
+            except Exception as e:
+                print(f"Warning: Attempt {attempt+1} on {model} failed: {e}")
+                time.sleep(4)
+
+    raise RuntimeError("All Hugging Face models failed to respond.")
 
 
-def run_generator(count: int = 2, target_category: str = "random", provider: str = "openai"):
-    api_key = os.environ.get("AI_IMAGE_API_KEY") or os.environ.get("OPENAI_API_KEY")
+def generate_image_with_pollinations(prompt: str) -> bytes:
+    """
+    Fallback 100% Free FLUX generator (Pollinations.ai) requiring zero API keys.
+    """
+    encoded_prompt = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=1344&model=flux&nologo=true"
+    print("Calling Pollinations FLUX engine (Zero-key fallback)...")
+    return http_get_bytes(url, timeout=70)
+
+
+# ---------------------------------------------------------------------------
+# MAIN WORKER RUNNER
+# ---------------------------------------------------------------------------
+
+def run_generator(count: int = 2, target_category: str = "random"):
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    hf_token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_API_KEY", "").strip()
     repo = os.environ.get("GITHUB_REPOSITORY", "").strip()
 
-    print("=" * 60)
-    print(" Vivid Notch AI - Automated Camera Cutout Generator")
-    print(f" Target Count: {count}")
-    print(f" Category:     {target_category}")
-    print(f" Provider:     {provider}")
-    print(f" Repository:   {repo if repo else '(local execution)'}")
-    print("=" * 60)
+    print("=" * 65)
+    print(" Vivid Notch AI - Two-Stage Automated AI Generator")
+    print(f" Stage 1 (Text):  {'Google Gemini 1.5 Flash' if gemini_key else 'Curated Prompt Catalog'}")
+    print(f" Stage 2 (Image): {'Hugging Face FLUX.1' if hf_token else 'Pollinations FLUX / Fallback'}")
+    print(f" Target Count:    {count}")
+    print(f" Category:        {target_category}")
+    print(f" Repository:      {repo if repo else '(local)'}")
+    print("=" * 65)
 
-    is_live_api = bool(api_key and len(api_key) > 10 and not api_key.startswith("your_"))
-    if not is_live_api:
-        print("\n[NOTE] AI_IMAGE_API_KEY is not configured or in placeholder mode.")
-        print("-> The worker will create clean test artworks so the GitHub Action passes.")
-        print("-> To enable real AI generation, add AI_IMAGE_API_KEY to GitHub Secrets!\n")
+    if not gemini_key:
+        print("[TIP] To enable dynamic AI prompt synthesis, add GEMINI_API_KEY in GitHub Secrets.")
+    if not hf_token:
+        print("[TIP] To enable Hugging Face FLUX image generation, add HF_TOKEN in GitHub Secrets.")
 
     # Ensure directories exist
     for folder in CATEGORY_FOLDERS.values():
@@ -246,17 +380,37 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
             with open(CATALOG_PATH, "r", encoding="utf-8") as f:
                 catalog = json.load(f)
         except Exception as e:
-            print(f"Warning: Could not read existing catalog ({e}), initializing empty catalog.")
+            print(f"Warning: Could not read existing catalog ({e}), starting empty.")
             catalog = []
 
     existing_ids = {item.get("id") for item in catalog}
     new_entries = []
-
     categories_list = list(PROMPT_CATALOG.keys())
 
     for i in range(count):
         cat = target_category if target_category in PROMPT_CATALOG else random.choice(categories_list)
-        prompt_info = random.choice(PROMPT_CATALOG[cat])
+
+        print(f"\n--- [{i+1}/{count}] Processing Category: '{cat}' ---")
+
+        # -------------------------------------------------------------------
+        # STAGE 1: Concept & Text Generation
+        # -------------------------------------------------------------------
+        prompt_info = None
+        if gemini_key:
+            try:
+                prompt_info = generate_concept_with_gemini(cat, gemini_key)
+            except Exception as e:
+                print(f"Notice: Gemini generation error ({e}). Falling back to curated catalog.")
+
+        if not prompt_info:
+            prompt_info = random.choice(PROMPT_CATALOG[cat])
+
+        title = prompt_info["title"]
+        prompt_text = prompt_info["prompt"]
+        desc = prompt_info["description"]
+        cutout_type = prompt_info.get("cutoutType", CUTOUT_TYPE_MAP.get(cat, "centerHole"))
+        fallback_colors = prompt_info.get("colors", ["#000000", "#FFB703"])
+        category_folder = CATEGORY_FOLDERS.get(cat, "categories/center_hole")
 
         timestamp_str = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         uid = f"wp_{timestamp_str}_{random.randint(100, 999)}"
@@ -264,40 +418,45 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
             uid = f"wp_{timestamp_str}_{random.randint(1000, 9999)}"
         existing_ids.add(uid)
 
-        title = prompt_info["title"]
-        prompt_text = prompt_info["prompt"]
-        desc = prompt_info["description"]
-        cutout_type = prompt_info.get("cutoutType", "centerHole")
-        fallback_colors = prompt_info.get("colors", ["#000000", "#FFB703"])
-        category_folder = CATEGORY_FOLDERS.get(cat, "categories/center_hole")
-
         filename = f"{uid}.png"
         thumb_filename = f"{uid}.png"
 
         full_img_path = WALLPAPERS_DIR / category_folder / filename
         thumb_img_path = THUMBNAILS_DIR / thumb_filename
 
-        print(f"\n[{i+1}/{count}] Generating '{title}' ({cat})...")
-
-        # Generate or download image bytes
+        # -------------------------------------------------------------------
+        # STAGE 2: Image Generation
+        # -------------------------------------------------------------------
         img_bytes = None
-        if is_live_api and provider == "openai":
-            try:
-                img_bytes = generate_image_openai(prompt_text, api_key)
-            except Exception as e:
-                print(f"API generation error: {e}")
-                print("Falling back to procedural artwork...")
-                img_bytes = create_pure_python_png(720, 1280, fallback_colors[0], fallback_colors[1])
-        else:
-            img_bytes = create_pure_python_png(720, 1280, fallback_colors[0], fallback_colors[1])
-            time.sleep(0.2)
+        ai_engine_name = "Vivid Notch Procedural"
 
-        # Save master image
+        if hf_token:
+            try:
+                img_bytes = generate_image_with_huggingface(prompt_text, hf_token)
+                ai_engine_name = "Gemini + FLUX.1-schnell" if gemini_key else "Hugging Face FLUX.1"
+            except Exception as e:
+                print(f"HF Generation failed ({e}). Trying Pollinations FLUX...")
+                try:
+                    img_bytes = generate_image_with_pollinations(prompt_text)
+                    ai_engine_name = "Gemini + Pollinations FLUX" if gemini_key else "Pollinations FLUX"
+                except Exception as e2:
+                    print(f"Pollinations also failed ({e2}). Using clean procedural PNG...")
+                    img_bytes = create_pure_python_png(720, 1280, fallback_colors[0], fallback_colors[1])
+        else:
+            # Try Pollinations free endpoint first
+            try:
+                img_bytes = generate_image_with_pollinations(prompt_text)
+                ai_engine_name = "Gemini + Pollinations FLUX" if gemini_key else "Pollinations FLUX"
+            except Exception as e:
+                print(f"Pollinations fallback failed ({e}). Writing procedural artwork...")
+                img_bytes = create_pure_python_png(720, 1280, fallback_colors[0], fallback_colors[1])
+
+        # Save Full-Res Master
         with open(full_img_path, "wb") as f:
             f.write(img_bytes)
         print(f"Saved master image: {full_img_path.relative_to(REPO_ROOT)}")
 
-        # Save thumbnail
+        # Save WebP or PNG thumbnail
         if HAS_PIL:
             try:
                 pil_img = Image.open(BytesIO(img_bytes))
@@ -343,32 +502,29 @@ def run_generator(count: int = 2, target_category: str = "random", provider: str
             "description": desc,
             "views": random.randint(120, 950),
             "isLiked": False,
-            "aiEngine": "DALL-E 3 / Vivid Notch AI" if is_live_api else "Vivid Notch Procedural"
+            "aiEngine": ai_engine_name
         }
 
         new_entries.append(new_entry)
 
-    # Prepend new entries so latest wallpapers appear at the top
+    # Prepend new entries so latest appear first
     updated_catalog = new_entries + catalog
 
-    # Save updated catalog
     with open(CATALOG_PATH, "w", encoding="utf-8") as f:
         json.dump(updated_catalog, f, indent=2, ensure_ascii=False)
 
-    print("\n" + "=" * 60)
-    print(f" Done! Added {len(new_entries)} new cutout wallpapers to catalog.json.")
+    print("\n" + "=" * 65)
+    print(f" Done! Added {len(new_entries)} new wallpapers to catalog.json.")
     print(f" Total wallpapers in catalog: {len(updated_catalog)}")
-    print("=" * 60)
+    print("=" * 65)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate Cutout Wallpapers for Vivid Notch AI")
+    parser = argparse.ArgumentParser(description="Vivid Notch AI - Automated Wallpaper Worker")
     parser.add_argument("--count", type=int, default=int(os.environ.get("WALLPAPERS_COUNT", "2")),
                         help="Number of wallpapers to generate (default: 2)")
     parser.add_argument("--category", type=str, default="random",
                         help="Target category (or 'random')")
-    parser.add_argument("--provider", type=str, default=os.environ.get("AI_PROVIDER", "openai"),
-                        help="AI Provider: openai (default), stability, or mock")
 
     args = parser.parse_args()
-    run_generator(count=args.count, target_category=args.category, provider=args.provider)
+    run_generator(count=args.count, target_category=args.category)
