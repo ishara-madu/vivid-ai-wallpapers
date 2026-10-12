@@ -1,23 +1,5 @@
 [
   {
-    "id": "center_hole",
-    "name": "Center Hole",
-    "description": "Customized for center punch-hole cameras (Samsung Galaxy, Xiaomi, Pixel, Nothing)",
-    "folder": "categories/center_hole"
-  },
-  {
-    "id": "dynamic_island",
-    "name": "Dynamic Island",
-    "description": "Engineered for capsule and pill cutouts (iPhone 14-16 Pro, Honor Magic Pill)",
-    "folder": "categories/dynamic_island"
-  },
-  {
-    "id": "left_corner",
-    "name": "Left Corner",
-    "description": "Designed for top-left hole-punch cameras (OnePlus, Realme, older Galaxy)",
-    "folder": "categories/left_corner"
-  },
-  {
     "id": "creative_cutouts",
     "name": "Creative Cutouts",
     "description": "Playful and artistic character interactions orbiting your phone camera",
@@ -25,8 +7,44 @@
   },
   {
     "id": "amoled_stealth",
-    "name": "AMOLED Stealth",
+    "name": "AMOLED & Stealth",
     "description": "Deep #000000 true black fade seamlessly camouflaging any notch or cutout",
     "folder": "categories/amoled_stealth"
+  },
+  {
+    "id": "cyberpunk",
+    "name": "Cyberpunk & Sci-Fi",
+    "description": "Futuristic, neon-drenched sci-fi aesthetics and mecha designs",
+    "folder": "categories/cyberpunk"
+  },
+  {
+    "id": "abstract",
+    "name": "Abstract & 3D",
+    "description": "Fluid geometric shapes, modern 3D renders, and optical depth",
+    "folder": "categories/abstract"
+  },
+  {
+    "id": "minimal",
+    "name": "Minimal & Vector",
+    "description": "Clean vector lines, understated elegance, and uncluttered visuals",
+    "folder": "categories/minimal"
+  },
+  {
+    "id": "landscapes",
+    "name": "Nature & Landscapes",
+    "description": "Breathtaking landscapes, scenic mountains, and atmospheric skies",
+    "folder": "categories/landscapes"
+  },
+  {
+    "id": "anime",
+    "name": "Anime & Gaming",
+    "description": "Vibrant pop culture art, anime heroes, and gaming themes",
+    "folder": "categories/anime"
+  },
+  {
+    "id": "vibrant_flows",
+    "name": "Vibrant Flows",
+    "description": "Energetic light streaks, glowing liquid waves, and chromatic bursts",
+    "folder": "categories/vibrant_flows"
   }
 ]
