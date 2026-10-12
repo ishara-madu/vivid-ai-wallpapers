@@ -22,28 +22,6 @@
     "aiEngine": "Gemini + Pollinations FLUX"
   },
   {
-    "id": "wp_20261012_051552_657",
-    "title": "Cosmic Eclipse Halo",
-    "category": "Center Hole",
-    "cutoutType": "centerHole",
-    "imageUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/categories/center_hole/wp_20261012_051552_657.png",
-    "thumbnailUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/thumbnails/wp_20261012_051552_657.png",
-    "isMultivariant": false,
-    "variants": [],
-    "cutoutVariants": {},
-    "gradientFallback": [
-      "#000000",
-      "#FFB703"
-    ],
-    "resolution": "4K Ultra HD",
-    "dimensions": "1080 x 2400",
-    "uploadDate": "October 12, 2026",
-    "description": "Luminous golden solar corona orbiting the center camera punch-hole against an infinite AMOLED black void.",
-    "views": 611,
-    "isLiked": false,
-    "aiEngine": "Vivid Notch Procedural"
-  },
-  {
     "id": "wp_20261012_034850_824",
     "title": "Cat on the Bezel",
     "category": "Creative Cutouts",
