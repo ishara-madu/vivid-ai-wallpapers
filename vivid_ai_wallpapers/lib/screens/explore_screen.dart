@@ -59,27 +59,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       if (list.isEmpty) {
         list = widget.wallpapers.toList();
       }
-    } else if (_selectedCategory == 'Center Hole') {
-      list = widget.wallpapers
-          .where((w) => w.cutoutType == CutoutType.centerHole)
-          .toList();
-    } else if (_selectedCategory == 'Dynamic Island') {
-      list = widget.wallpapers
-          .where((w) => w.cutoutType == CutoutType.dynamicIsland)
-          .toList();
-    } else if (_selectedCategory == 'Left Corner') {
-      list = widget.wallpapers
-          .where((w) => w.cutoutType == CutoutType.leftHole)
-          .toList();
-    } else if (_selectedCategory == 'AMOLED Stealth') {
-      list = widget.wallpapers
-          .where((w) => w.cutoutType == CutoutType.universal)
-          .toList();
-    } else if (_selectedCategory == 'Creative Cutouts') {
-      list = widget.wallpapers
-          .where((w) => w.category == 'Creative Cutouts')
-          .toList();
-    } else {
+    } else if (_selectedCategory == 'All') {
       // 'All': sort user's cutout to the front
       list = List<Wallpaper>.from(widget.wallpapers);
       list.sort((a, b) {
@@ -87,6 +67,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
         final bMatch = b.cutoutType == widget.selectedCutout ? 0 : 1;
         return aMatch.compareTo(bMatch);
       });
+    } else {
+      // Filter dynamically by artistic category
+      final targetCat = _selectedCategory.toLowerCase().trim();
+      list = widget.wallpapers.where((w) {
+        final cat = w.category.toLowerCase().trim();
+        return cat == targetCat || cat.contains(targetCat) || targetCat.contains(cat);
+      }).toList();
     }
 
     // 2. Filter by search query if any

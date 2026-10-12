@@ -10,11 +10,14 @@ class SampleData {
 
   static const List<String> categories = [
     'For You',
-    'Center Hole',
-    'Dynamic Island',
-    'Left Corner',
     'Creative Cutouts',
-    'AMOLED Stealth',
+    'AMOLED & Stealth',
+    'Cyberpunk & Sci-Fi',
+    'Abstract & 3D',
+    'Minimal & Vector',
+    'Nature & Landscapes',
+    'Anime & Gaming',
+    'Vibrant Flows',
     'All',
   ];
 }
