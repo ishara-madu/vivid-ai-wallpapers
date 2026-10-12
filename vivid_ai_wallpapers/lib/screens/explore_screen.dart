@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_top_bar.dart';
 import '../widgets/bouncing_wrapper.dart';
 import '../widgets/category_pill.dart';
+import '../widgets/offline_indicator.dart';
 import '../widgets/wallpaper_card.dart';
 import 'wallpaper_detail_screen.dart';
 
@@ -17,6 +18,9 @@ class ExploreScreen extends StatefulWidget {
   final CutoutType selectedCutout;
   final VoidCallback onOpenCutoutSelector;
   final Future<void> Function()? onRefresh;
+  final VoidCallback? onRetry;
+  final bool isLoading;
+  final bool isOffline;
   final bool isDark;
 
   const ExploreScreen({
@@ -28,6 +32,9 @@ class ExploreScreen extends StatefulWidget {
     required this.selectedCutout,
     required this.onOpenCutoutSelector,
     this.onRefresh,
+    this.onRetry,
+    this.isLoading = false,
+    this.isOffline = false,
     this.isDark = false,
   });
 
@@ -220,54 +227,160 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            // Horizontal Category Pills
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 44,
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: widget.categories.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 10),
-                  itemBuilder: (context, index) {
-                    final category = widget.categories[index];
-                    final isSelected = category == _selectedCategory;
-                    return CategoryPill(
-                      title: category,
-                      isSelected: isSelected,
-                      isDark: widget.isDark,
-                      onTap: () {
-                        setState(() {
-                          _selectedCategory = category;
-                        });
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-            // Wallpapers Grid (2 columns)
-            _filteredWallpapers.isEmpty
-                ? SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(40),
-                      child: Center(
-                        child: Text(
-                          'No wallpapers found for this cutout style.',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.textMuted,
-                            fontSize: 14,
-                          ),
-                        ),
+            // Offline Banner when data is off but previous wallpapers exist
+            if (widget.isOffline && widget.wallpapers.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF523B).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFFF523B).withOpacity(0.35),
+                        width: 1,
                       ),
                     ),
-                  )
-                : SliverPadding(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          AmazingIconOutlined.wifiSquare,
+                          color: Color(0xFFFF523B),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'දත්ත සබඳතාව ක්‍රියා විරහිතයි (Data Off). අලුත් wallpapers බැලීමට Data On කරන්න.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: widget.isDark ? Colors.white : AppColors.textDark,
+                            ),
+                          ),
+                        ),
+                        if (widget.onRetry != null)
+                          GestureDetector(
+                            onTap: widget.onRetry,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF523B),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Retry',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+            // Horizontal Category Pills
+            if (widget.wallpapers.isNotEmpty)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 44,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: widget.categories.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 10),
+                    itemBuilder: (context, index) {
+                      final category = widget.categories[index];
+                      final isSelected = category == _selectedCategory;
+                      return CategoryPill(
+                        title: category,
+                        isSelected: isSelected,
+                        isDark: widget.isDark,
+                        onTap: () {
+                          setState(() {
+                            _selectedCategory = category;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+            if (widget.wallpapers.isNotEmpty)
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+            // Body: Offline / Loading / Wallpapers Grid
+            if (widget.isOffline && widget.wallpapers.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: OfflineIndicator(
+                  isDark: widget.isDark,
+                  isRetrying: widget.isLoading,
+                  onRetry: widget.onRetry ?? () {},
+                ),
+              )
+            else if (widget.isLoading && widget.wallpapers.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryPurple),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        'AI Wallpapers ලබාගනිමින් පවතී...',
+                        style: GoogleFonts.poppins(
+                          color: widget.isDark ? Colors.white : AppColors.textDark,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Connecting to repository catalog...',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else if (_filteredWallpapers.isEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Center(
+                    child: Text(
+                      'No wallpapers found for this cutout style.',
+                      style: GoogleFonts.poppins(
+                        color: AppColors.textMuted,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: SliverGrid(
                       gridDelegate:
