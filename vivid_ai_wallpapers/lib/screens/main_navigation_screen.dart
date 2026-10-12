@@ -3,6 +3,7 @@ import 'package:amazing_icons/amazing_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../data/sample_wallpapers.dart';
 import '../models/wallpaper.dart';
+import '../services/wallpaper_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bouncing_wrapper.dart';
 import '../widgets/cutout_setup_dialog.dart';
@@ -39,10 +40,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     _collections = SampleData.collections;
     _categories = SampleData.categories;
 
+    _loadLiveWallpapers();
+
     // Show initial visual cutout setup modal when app launches
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _promptCutoutSetup();
     });
+  }
+
+  Future<void> _loadLiveWallpapers() async {
+    final live = await WallpaperService.fetchLiveWallpapers();
+    if (mounted && live.isNotEmpty) {
+      setState(() {
+        _wallpapers = live;
+      });
+    }
   }
 
   void _promptCutoutSetup() {

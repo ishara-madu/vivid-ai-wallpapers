@@ -177,13 +177,15 @@ def http_post_binary(url: str, headers: dict, payload: dict, timeout: int = 90) 
 
 def http_get_bytes(url: str, timeout: int = 60) -> bytes:
     """Download binary data via HTTP with requests or urllib."""
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     if HAS_REQUESTS:
-        resp = requests.get(url, timeout=timeout)
+        resp = requests.get(url, headers=headers, timeout=timeout)
         if resp.status_code != 200:
             raise RuntimeError(f"HTTP Download failed: {resp.status_code}")
         return resp.content
     else:
-        with urllib.request.urlopen(url, timeout=timeout) as response:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout) as response:
             return response.read()
 
 
