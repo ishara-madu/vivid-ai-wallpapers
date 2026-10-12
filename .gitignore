@@ -51,3 +51,6 @@ ENV/
 .idea/
 *.iml
 .vscode/
+
+# Git Worktree
+vivid-web-uploader/
