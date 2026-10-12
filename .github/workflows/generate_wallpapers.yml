@@ -1,11 +1,11 @@
 name: Auto-Generate AI Wallpapers
 
 on:
-  schedule:
-    # Runs twice a day: at 00:00 UTC and 12:00 UTC (12 hours apart)
-    - cron: '0 0,12 * * *'
+  # Scheduled auto-generation disabled (uncomment if you want scheduled AI generation)
+  # schedule:
+  #   - cron: '0 0,12 * * *'
   
-  # Allows manual triggering from the Actions tab
+  # Allows manual triggering from the Actions tab only if explicitly needed
   workflow_dispatch:
     inputs:
       count:
