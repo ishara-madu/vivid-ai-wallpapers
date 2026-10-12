@@ -20,36 +20,14 @@
   const DEFAULT_BRANCH = 'main';
 
   const CATEGORY_MAP = {
-    'Center Hole': {
-      cutoutType: 'centerHole',
-      folder: 'categories/center_hole',
-      notchOverlay: 'centerHole',
-      notchLabel: 'Center Punch Hole'
-    },
-    'Dynamic Island': {
-      cutoutType: 'dynamicIsland',
-      folder: 'categories/dynamic_island',
-      notchOverlay: 'dynamicIsland',
-      notchLabel: 'Dynamic Island'
-    },
-    'Left Corner': {
-      cutoutType: 'leftHole',
-      folder: 'categories/left_corner',
-      notchOverlay: 'leftHole',
-      notchLabel: 'Left Corner Hole'
-    },
-    'Creative Cutouts': {
-      cutoutType: 'centerHole',
-      folder: 'categories/creative_cutouts',
-      notchOverlay: 'centerHole',
-      notchLabel: 'Creative Cutouts'
-    },
-    'AMOLED Stealth': {
-      cutoutType: 'universal',
-      folder: 'categories/amoled_stealth',
-      notchOverlay: 'none',
-      notchLabel: 'Universal AMOLED'
-    }
+    'Creative Cutouts': { folder: 'categories/creative_cutouts' },
+    'AMOLED & Stealth': { folder: 'categories/amoled_stealth' },
+    'Cyberpunk & Sci-Fi': { folder: 'categories/cyberpunk' },
+    'Abstract & 3D': { folder: 'categories/abstract' },
+    'Minimal & Vector': { folder: 'categories/minimal' },
+    'Nature & Landscapes': { folder: 'categories/landscapes' },
+    'Anime & Gaming': { folder: 'categories/anime' },
+    'Vibrant Flows': { folder: 'categories/vibrant_flows' }
   };
 
   let state = {
@@ -493,22 +471,25 @@
   }
 
   function setupFormEvents() {
-    // When Category changes, auto-update cutout type and overlay preview
-    elements.selectCategory.addEventListener('change', () => {
-      const cat = elements.selectCategory.value;
-      const conf = CATEGORY_MAP[cat];
-      if (conf) {
-        elements.selectCutoutType.value = conf.cutoutType;
-        setCutoutOverlay(conf.notchOverlay);
-      }
-    });
-
+    // When Notch Type dropdown changes, update simulator overlay preview
     elements.selectCutoutType.addEventListener('change', () => {
       const type = elements.selectCutoutType.value;
       if (type === 'centerHole') setCutoutOverlay('centerHole');
       else if (type === 'dynamicIsland') setCutoutOverlay('dynamicIsland');
       else if (type === 'leftHole') setCutoutOverlay('leftHole');
       else setCutoutOverlay('none');
+    });
+
+    // When simulator tabs are clicked, sync with Notch Type dropdown
+    elements.cutoutTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const cutout = tab.dataset.cutout;
+        setCutoutOverlay(cutout);
+        if (cutout === 'centerHole') elements.selectCutoutType.value = 'centerHole';
+        else if (cutout === 'dynamicIsland') elements.selectCutoutType.value = 'dynamicIsland';
+        else if (cutout === 'leftHole') elements.selectCutoutType.value = 'leftHole';
+        else if (cutout === 'none') elements.selectCutoutType.value = 'universal';
+      });
     });
 
     elements.btnReset.addEventListener('click', () => {
