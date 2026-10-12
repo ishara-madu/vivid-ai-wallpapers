@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vivid Studio • AMOLED & Camera Cutout Wallpaper Publisher</title>
+  <meta name="description" content="Curate, preview, and publish ultra-high-definition wallpapers with tailored camera notch and punch-hole cutouts directly to your Vivid Notch AI repository.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#" class="brand" id="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="7" r="3" stroke="#06B6D4" fill="#0A0D14" />
+            <rect x="5" y="2" width="14" height="20" rx="3" stroke="#A855F7" />
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>Vivid Studio <span class="brand-badge">PRO</span></h1>
+          <p>Curated Wallpaper & Notch Cutout Publisher</p>
+        </div>
+      </a>
+
+      <!-- Center Tabs -->
+      <nav class="nav-tabs">
+        <button class="tab-btn active" id="tab-uploader" data-target="view-uploader">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          Upload New
+        </button>
+        <button class="tab-btn" id="tab-catalog" data-target="view-catalog">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Live Catalog <span class="badge" id="catalog-count-badge">0</span>
+        </button>
+        <button class="tab-btn" id="tab-settings" data-target="view-settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          GitHub Settings
+        </button>
+      </nav>
+
+      <!-- Right Status Badge -->
+      <div class="header-actions">
+        <button class="status-pill" id="btn-status-pill" title="Click to configure GitHub Token">
+          <span class="indicator" id="status-indicator-dot"></span>
+          <span id="status-text">Token Required</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Areas -->
+  <main class="container main-wrapper">
+
+    <!-- VIEW 1: UPLOADER & NOTCH INSPECTOR -->
+    <section class="view-section active" id="view-uploader">
+      <div class="studio-grid">
+
+        <!-- Left Column: Form & Upload Controls -->
+        <div class="glass-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Upload Wallpaper
+            </h2>
+            <p class="panel-subtitle">Select your curated artwork. Master image &amp; WebP thumbnail will be auto-generated and committed to GitHub.</p>
+          </div>
+
+          <!-- Drag and Drop Upload Area -->
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="file-input" class="dropzone-file-input" accept="image/png,image/jpeg,image/webp,image/jpg">
+            <div class="dropzone-content">
+              <div class="dropzone-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+              </div>
+              <div class="dropzone-text">
+                <h3>Drag &amp; Drop Wallpaper Image Here</h3>
+                <p>or click to browse from your device (PNG, JPG, or WebP)</p>
+              </div>
+              <div class="dropzone-badges">
+                <span class="pill-tag">Ultra HD Recommended</span>
+                <span class="pill-tag">Auto WebP Thumbnail</span>
+                <span class="pill-tag">AMOLED Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active File Info Banner -->
+          <div class="file-loaded-bar" id="file-loaded-bar">
+            <div class="file-meta-info">
+              <div class="file-icon-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <div class="file-name-size">
+                <h4 id="file-title-display">image.png</h4>
+                <p id="file-dimensions-display">Dimensions: Calculating...</p>
+              </div>
+            </div>
+            <button type="button" class="btn-remove-file" id="btn-remove-file" title="Remove selected file">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Metadata Fields -->
+          <form class="metadata-form" id="form-wallpaper" onsubmit="return false;">
+            
+            <div class="form-group">
+              <label for="input-title" class="form-label">
+                Wallpaper Title
+                <span class="helper">Shown prominently in app</span>
+              </label>
+              <input type="text" id="input-title" class="form-input" placeholder="e.g. Cyber Optic HUD Ring" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="select-category" class="form-label">Cutout Category</label>
+                <select id="select-category" class="form-select">
+                  <option value="Center Hole">🎯 Center Hole</option>
+                  <option value="Dynamic Island">🏝️ Dynamic Island</option>
+                  <option value="Left Corner">📐 Left Corner</option>
+                  <option value="Creative Cutouts" selected>🎨 Creative Cutouts</option>
+                  <option value="AMOLED Stealth">🖤 AMOLED Stealth</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="select-cutout-type" class="form-label">
+                  Target Notch Style
+                  <span class="helper">Auto-synced</span>
+                </label>
+                <select id="select-cutout-type" class="form-select">
+                  <option value="centerHole">Center Hole (Punch)</option>
+                  <option value="dynamicIsland">Dynamic Island (Pill)</option>
+                  <option value="leftHole">Left Corner (Hole)</option>
+                  <option value="universal">Universal / Notchless</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Auto Color Extractor -->
+            <div class="form-group">
+              <label class="form-label">
+                Extracted Color Fallback
+                <span class="helper">Auto-detected from image pixels</span>
+              </label>
+              <div class="color-extractor-wrap">
+                <div class="gradient-preview-bar" id="gradient-preview-bar"></div>
+                <div class="color-inputs">
+                  <div class="color-chip-group">
+                    <input type="color" id="input-color-primary" value="#0F172A">
+                    <span class="color-hex-label" id="color-hex-primary">#0F172A</span>
+                  </div>
+                  <div class="color-chip-group">
+                    <input type="color" id="input-color-secondary" value="#38BDF8">
+                    <span class="color-hex-label" id="color-hex-secondary">#38BDF8</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-resolution" class="form-label">Resolution Label</label>
+                <input type="text" id="input-resolution" class="form-input" value="4K Ultra HD">
+              </div>
+
+              <div class="form-group">
+                <label for="input-dimensions" class="form-label">Exact Dimensions</label>
+                <input type="text" id="input-dimensions" class="form-input" value="1080 x 2400" readonly>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-description" class="form-label">Description (Optional)</label>
+              <textarea id="input-description" class="form-textarea" placeholder="Crafted for vivid camera cutouts with deep AMOLED contrast."></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+              <button type="button" class="btn-primary" id="btn-publish" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Publish to GitHub &amp; App
+              </button>
+              <button type="button" class="btn-secondary" id="btn-reset">
+                Reset
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Right Column: Interactive Phone Mockup & Cutout Inspector -->
+        <div class="glass-panel simulator-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="3"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+              Live Cutout Inspector
+            </h2>
+            <p class="panel-subtitle">Test how your wallpaper lines up with real device camera cutouts.</p>
+          </div>
+
+          <!-- Cutout Switcher Tabs -->
+          <div class="cutout-selector-bar" id="cutout-overlay-tabs">
+            <button class="cutout-tab-pill active" data-cutout="centerHole">Center Hole</button>
+            <button class="cutout-tab-pill" data-cutout="dynamicIsland">Dynamic Island</button>
+            <button class="cutout-tab-pill" data-cutout="leftHole">Left Hole</button>
+            <button class="cutout-tab-pill" data-cutout="none">No Cutout</button>
+          </div>
+
+          <!-- Smartphone Frame -->
+          <div class="phone-mockup-wrapper">
+            <div class="phone-device" id="phone-device-frame">
+              <div class="phone-earpiece"></div>
+
+              <div class="phone-screen" id="phone-screen-viewport">
+                <!-- Status bar -->
+                <div class="phone-status-bar">
+                  <span>9:41</span>
+                  <div class="phone-status-icons">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Camera Notch Overlays -->
+                <div class="cutout-overlay cutout-center-hole" id="overlay-center-hole"></div>
+                <div class="cutout-overlay cutout-dynamic-island" id="overlay-dynamic-island" style="display: none;">
+                  <div class="island-cam"></div>
+                  <div class="island-sensor"></div>
+                </div>
+                <div class="cutout-overlay cutout-left-hole" id="overlay-left-hole" style="display: none;"></div>
+
+                <!-- Image Preview Inside Mockup -->
+                <img id="phone-wallpaper-preview" class="phone-wallpaper-img" style="display: none;" alt="Wallpaper Cutout Preview">
+
+                <!-- Placeholder Empty State -->
+                <div class="phone-empty-state" id="phone-empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"/>
+                  </svg>
+                  <p>Upload a wallpaper on the left to inspect the camera cutout alignment in real-time</p>
+                </div>
+
+                <!-- Home bar -->
+                <div class="phone-home-indicator"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thumbnail Info Stats -->
+          <div class="simulator-stats">
+            <div class="stat-item">
+              <h5>Optimized WebP</h5>
+              <p id="stat-thumb-size">Auto 360 × 640</p>
+            </div>
+            <div class="stat-item">
+              <h5>App Load Speed</h5>
+              <p style="color: var(--accent-emerald);">⚡ Instant</p>
+            </div>
+            <div class="stat-item">
+              <h5>Target Notch</h5>
+              <p id="stat-notch-name">Center Punch</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 2: LIVE CATALOG MANAGER -->
+    <section class="view-section" id="view-catalog">
+      <div class="glass-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Live Catalog Manager
+          </h2>
+          <p class="panel-subtitle">Manage all wallpapers currently served from your GitHub repository to the mobile app.</p>
+        </div>
+
+        <!-- Catalog Toolbar -->
+        <div class="catalog-toolbar">
+          <div class="catalog-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="catalog-search-input" class="catalog-search-input" placeholder="Search by title, category, or ID...">
+          </div>
+
+          <div class="catalog-filter-pills" id="catalog-filter-pills">
+            <button class="cat-pill active" data-filter="All">All Wallpapers</button>
+            <button class="cat-pill" data-filter="Center Hole">Center Hole</button>
+            <button class="cat-pill" data-filter="Dynamic Island">Dynamic Island</button>
+            <button class="cat-pill" data-filter="Left Corner">Left Corner</button>
+            <button class="cat-pill" data-filter="Creative Cutouts">Creative Cutouts</button>
+            <button class="cat-pill" data-filter="AMOLED Stealth">AMOLED Stealth</button>
+          </div>
+        </div>
+
+        <!-- Catalog Grid -->
+        <div class="catalog-grid" id="catalog-grid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+
+        <!-- Empty state when no items -->
+        <div class="phone-empty-state" id="catalog-empty-state" style="display: none; padding: 60px 0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>No wallpapers found matching your filter</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: GITHUB SETTINGS -->
+    <section class="view-section" id="view-settings">
+      <div class="glass-panel settings-wrap">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+            GitHub Integration &amp; Authentication
+          </h2>
+          <p class="panel-subtitle">Connect your repository so wallpapers can be uploaded directly to GitHub without any server.</p>
+        </div>
+
+        <form id="form-settings" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="form-group">
+            <label for="input-repo-owner" class="form-label">Repository (Owner / Name)</label>
+            <input type="text" id="input-repo-owner" class="form-input" value="ishara-madu/vivid-ai-wallpapers" required>
+          </div>
+
+          <div class="form-group">
+            <label for="input-repo-branch" class="form-label">Target Branch</label>
+            <input type="text" id="input-repo-branch" class="form-input" value="main" required>
+          </div>
+
+          <div class="form-group">
+            <label for="input-github-token" class="form-label">
+              GitHub Personal Access Token (PAT)
+              <span class="helper">Saved securely only in your browser</span>
+            </label>
+            <div style="position: relative;">
+              <input type="password" id="input-github-token" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="padding-right: 48px;" required>
+              <button type="button" id="btn-toggle-token-mask" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div class="form-actions" style="margin-top: 10px;">
+            <button type="button" class="btn-primary" id="btn-save-settings">
+              Save &amp; Test Connection
+            </button>
+          </div>
+        </form>
+
+        <!-- Step-by-Step Guide -->
+        <div class="token-help-box">
+          <h4>💡 How to create a GitHub Token in 30 seconds:</h4>
+          <ol>
+            <li>Go to <a href="https://github.com/settings/tokens/new?scopes=repo&description=Vivid+Wallpaper+Studio" target="_blank" rel="noopener">GitHub New Personal Access Token</a>.</li>
+            <li>Set Token name (e.g. <code>Vivid Wallpaper Studio</code>) and Expiration to <strong>No expiration</strong>.</li>
+            <li>Under Select scopes, ensure <strong>repo</strong> (Full control of private repositories) is checked.</li>
+            <li>Click <strong>Generate token</strong> at the bottom and copy the <code>ghp_...</code> string here.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Publish Stepper Modal -->
+  <div class="modal-backdrop" id="modal-publish">
+    <div class="modal-card">
+      <div class="modal-icon-wrap" id="modal-icon-wrap">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+      </div>
+
+      <h3 class="modal-title" id="modal-title">Publishing Wallpaper</h3>
+      <p class="modal-desc" id="modal-desc">Committing original artwork, WebP thumbnail, and metadata directly to GitHub...</p>
+
+      <div class="stepper-list" id="stepper-list">
+        <div class="step-item" id="step-1">
+          <div class="step-icon-state">1</div>
+          <span>Generating optimized 360x640 WebP thumbnail...</span>
+        </div>
+        <div class="step-item" id="step-2">
+          <div class="step-icon-state">2</div>
+          <span>Uploading master image to repository...</span>
+        </div>
+        <div class="step-item" id="step-3">
+          <div class="step-icon-state">3</div>
+          <span>Uploading WebP thumbnail to thumbnails/...</span>
+        </div>
+        <div class="step-item" id="step-4">
+          <div class="step-icon-state">4</div>
+          <span>Updating catalog.json on main branch...</span>
+        </div>
+      </div>
+
+      <div id="modal-success-actions" style="display: none; margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn-primary" id="btn-modal-done">Upload Another Wallpaper</button>
+        <a id="link-commit-view" href="#" target="_blank" rel="noopener" class="btn-secondary" style="text-decoration: none;">View Commit on GitHub ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Canvas for Image Processing & WebP Compression -->
+  <canvas id="canvas-engine" style="display: none;"></canvas>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
