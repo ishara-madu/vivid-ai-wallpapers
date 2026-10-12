@@ -824,6 +824,38 @@
     return await res.json();
   }
 
+  async function deleteFileFromGithub(path, commitMessage) {
+    if (!path) return false;
+    try {
+      const fileData = await fetchFileFromGithub(path);
+      if (!fileData || !fileData.sha) return false;
+
+      const res = await fetch(`https://api.github.com/repos/${state.repo}/contents/${path}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${state.token}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: commitMessage,
+          sha: fileData.sha,
+          branch: state.branch
+        })
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn(`Could not delete file ${path} from GitHub:`, err);
+      return false;
+    }
+  }
+
+  function getRepoPathFromUrl(url) {
+    if (!url) return null;
+    const match = url.match(/wallpapers\/(categories|thumbnails)\/[^?#\s]+/);
+    return match ? match[0] : null;
+  }
+
   // Unicode safe Base64 helpers
   function utf8ToBase64(str) {
     const bytes = new TextEncoder().encode(str);
@@ -1072,13 +1104,31 @@
       return;
     }
 
-    if (!confirm(`Are you sure you want to permanently remove ${count} marked wallpaper${count > 1 ? 's' : ''} from catalog.json?`)) {
+    if (!confirm(`Are you sure you want to permanently remove ${count} marked wallpaper${count > 1 ? 's' : ''} and their thumbnails from the repository?`)) {
       return;
     }
 
-    showToast(`Removing ${count} wallpapers from catalog...`, 'info');
+    showToast(`Deleting ${count} wallpapers & thumbnails from repository...`, 'info');
 
     try {
+      // 1. Concurrently delete all thumbnail and master image files from repo
+      const fileDeletePromises = [];
+      for (const id of state.selectedIds) {
+        const item = state.catalog.find(w => w.id === id);
+        if (item) {
+          const thumbPath = getRepoPathFromUrl(item.thumbnailUrl) || `wallpapers/thumbnails/${id}.webp`;
+          fileDeletePromises.push(deleteFileFromGithub(thumbPath, `Delete thumbnail: ${id}`));
+
+          const masterPath = getRepoPathFromUrl(item.imageUrl);
+          if (masterPath) {
+            fileDeletePromises.push(deleteFileFromGithub(masterPath, `Delete master image: ${id}`));
+          }
+        }
+      }
+
+      await Promise.allSettled(fileDeletePromises);
+
+      // 2. Remove all from catalog.json
       const catalogPath = 'wallpapers/metadata/catalog.json';
       const fileData = await fetchFileFromGithub(catalogPath);
       if (!fileData) throw new Error('Could not fetch catalog.json from GitHub');
@@ -1089,7 +1139,7 @@
       const jsonStr = JSON.stringify(updated, null, 2);
       const base64 = utf8ToBase64(jsonStr);
 
-      await commitFileToGithub(catalogPath, base64, `Batch remove ${count} wallpapers from catalog`, fileData.sha);
+      await commitFileToGithub(catalogPath, base64, `Batch remove ${count} wallpapers & thumbnails`, fileData.sha);
 
       state.catalog = updated;
       state.selectedIds.clear();
@@ -1097,7 +1147,7 @@
 
       updateBatchBar();
       renderCatalogGrid();
-      showToast(`Successfully removed ${count} wallpaper${count > 1 ? 's' : ''}!`, 'success');
+      showToast(`Successfully deleted ${count} wallpaper${count > 1 ? 's' : ''} and their thumbnails!`, 'success');
     } catch (err) {
       showToast(`Failed to delete: ${err.message}`, 'error');
     }
@@ -1114,13 +1164,26 @@
     const item = state.catalog.find(w => w.id === id);
     const title = item ? item.title : id;
 
-    if (!confirm(`Are you sure you want to remove "${title}" from catalog.json?`)) {
+    if (!confirm(`Are you sure you want to permanently remove "${title}" and its thumbnail from the repository?`)) {
       return;
     }
 
-    showToast(`Removing "${title}" from catalog...`, 'info');
+    showToast(`Removing "${title}" and thumbnail from repository...`, 'info');
 
     try {
+      if (item) {
+        // 1. Delete thumbnail file from repo
+        const thumbPath = getRepoPathFromUrl(item.thumbnailUrl) || `wallpapers/thumbnails/${id}.webp`;
+        await deleteFileFromGithub(thumbPath, `Delete thumbnail: ${id}`);
+
+        // 2. Delete master image file from repo
+        const masterPath = getRepoPathFromUrl(item.imageUrl);
+        if (masterPath) {
+          await deleteFileFromGithub(masterPath, `Delete master image: ${id}`);
+        }
+      }
+
+      // 3. Remove from catalog.json
       const catalogPath = 'wallpapers/metadata/catalog.json';
       const fileData = await fetchFileFromGithub(catalogPath);
       if (!fileData) throw new Error('Could not fetch catalog.json from GitHub');
@@ -1139,7 +1202,7 @@
 
       updateBatchBar();
       renderCatalogGrid();
-      showToast(`Removed "${title}" successfully`, 'success');
+      showToast(`Removed "${title}" and deleted thumbnail successfully!`, 'success');
     } catch (err) {
       showToast(`Failed to delete: ${err.message}`, 'error');
     }
