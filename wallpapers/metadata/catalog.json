@@ -1,5 +1,49 @@
 [
   {
+    "id": "wp_20261012_034850_824",
+    "title": "Cat on the Bezel",
+    "category": "Creative Cutouts",
+    "cutoutType": "centerHole",
+    "imageUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/categories/creative_cutouts/wp_20261012_034850_824.png",
+    "thumbnailUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/thumbnails/wp_20261012_034850_824.png",
+    "isMultivariant": false,
+    "variants": [],
+    "cutoutVariants": {},
+    "gradientFallback": [
+      "#000000",
+      "#FF685F"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "1080 x 2400",
+    "uploadDate": "October 12, 2026",
+    "description": "Charming black cat silhouette dangling with playful curiosity directly above the punch hole.",
+    "views": 630,
+    "isLiked": false,
+    "aiEngine": "Vivid Notch Procedural"
+  },
+  {
+    "id": "wp_20261012_034850_500",
+    "title": "Obsidian Stealth Abyss",
+    "category": "AMOLED Stealth",
+    "cutoutType": "universal",
+    "imageUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/categories/amoled_stealth/wp_20261012_034850_500.png",
+    "thumbnailUrl": "https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/wallpapers/thumbnails/wp_20261012_034850_500.png",
+    "isMultivariant": false,
+    "variants": [],
+    "cutoutVariants": {},
+    "gradientFallback": [
+      "#000000",
+      "#1E1B4B"
+    ],
+    "resolution": "4K Ultra HD",
+    "dimensions": "1080 x 2400",
+    "uploadDate": "October 12, 2026",
+    "description": "Seamless top-fade into absolute #000000 pure black, making any notch, pill, or hole-punch completely invisible.",
+    "views": 935,
+    "isLiked": false,
+    "aiEngine": "Vivid Notch Procedural"
+  },
+  {
     "id": "wp_20261011_155500_667",
     "title": "Astronaut Starlight Reach",
     "category": "Creative Cutouts",
