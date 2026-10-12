@@ -5,8 +5,8 @@ import '../models/wallpaper.dart';
 import '../theme/app_theme.dart';
 import 'bouncing_wrapper.dart';
 
-/// Interactive Visual Camera Cutout Selection Modal.
-/// Displays tactile phone mockups helping users instantly choose their device's camera style.
+/// Premium Gazeo-style Visual Camera Cutout Selection Modal.
+/// Features a tactile 2x2 grid of modern phone silhouettes with precise camera notch alignment.
 class CutoutSetupDialog extends StatefulWidget {
   final CutoutType currentCutout;
   final ValueChanged<CutoutType> onSelect;
@@ -53,174 +53,208 @@ class _CutoutSetupDialogState extends State<CutoutSetupDialog> {
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
+    final surfaceColor = isDark ? AppColors.darkSurface : Colors.white;
+    final textColor = isDark ? Colors.white : AppColors.textDark;
 
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.88,
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        color: surfaceColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 30,
-            offset: const Offset(0, -6),
+            color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.15),
+            blurRadius: 36,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Drag handle
-          Center(
-            child: Container(
-              width: 44,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.textMuted.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(2),
+      padding: const EdgeInsets.fromLTRB(22, 16, 22, 28),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Drag Handle
+            Center(
+              child: Container(
+                width: 38,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.18)
+                      : Colors.black.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 18),
+            const SizedBox(height: 20),
 
-          // Header
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryPurple.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  AmazingIconOutlined.mobile,
-                  color: AppColors.primaryPurple,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Select Camera Cutout',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : AppColors.textDark,
-                        letterSpacing: -0.3,
-                      ),
+            // Header Row with Glowing Icon
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryPurple.withValues(alpha: 0.16),
+                        AppColors.accentCoral.withValues(alpha: 0.16),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      AmazingIconOutlined.mobile,
+                      color: AppColors.primaryPurple,
+                      size: 22,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Camera Cutout',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Select your phone\'s camera notch to tailor wallpapers',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // 2x2 Tactile Cards Grid
+            Row(
+              children: [
+                Expanded(
+                  child: _buildGridCard(
+                    type: CutoutType.centerHole,
+                    title: 'Center Hole',
+                    subtitle: 'Galaxy, Pixel, Xiaomi',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildGridCard(
+                    type: CutoutType.dynamicIsland,
+                    title: 'Dynamic Island',
+                    subtitle: 'iPhone 14-16 Pro',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildGridCard(
+                    type: CutoutType.leftHole,
+                    title: 'Left Corner',
+                    subtitle: 'OnePlus, Realme',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildGridCard(
+                    type: CutoutType.universal,
+                    title: 'Universal',
+                    subtitle: 'Notchless & all phones',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+
+            // Confirm Button
+            BouncingWrapper(
+              lowerBound: 0.95,
+              onTap: () {
+                widget.onSelect(_selected);
+                Navigator.pop(context);
+              },
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(26),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryPurple.withValues(alpha: 0.38),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      AmazingIconFilled.tickCircle,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      'Wallpapers will be custom-fitted to your screen',
+                      'Apply Cutout Style',
                       style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Cutout Options Grid
-          Flexible(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  _buildCutoutCard(
-                    type: CutoutType.centerHole,
-                    title: 'Center Hole-Punch',
-                    subtitle: 'Samsung S21-S25, Xiaomi, Pixel, Nothing',
-                    badge: 'Most Popular',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCutoutCard(
-                    type: CutoutType.dynamicIsland,
-                    title: 'Dynamic Island / Pill',
-                    subtitle: 'iPhone 14-16 Pro, Honor Magic Pill',
-                    badge: 'Capsule Flow',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCutoutCard(
-                    type: CutoutType.leftHole,
-                    title: 'Left Corner Hole',
-                    subtitle: 'OnePlus, Realme, older Galaxy S10',
-                    badge: 'Corner Arc',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildCutoutCard(
-                    type: CutoutType.universal,
-                    title: 'Universal Stealth Fade',
-                    subtitle: 'Pure OLED black fade for all notches & waterdrops',
-                    badge: '100% Fit',
-                  ),
-                ],
-              ),
             ),
-          ),
-
-          const SizedBox(height: 18),
-
-          // Confirm Button
-          BouncingWrapper(
-            lowerBound: 0.95,
-            onTap: () {
-              widget.onSelect(_selected);
-              Navigator.pop(context);
-            },
-            child: Container(
-              height: 54,
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryPurple.withOpacity(0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(AmazingIconFilled.tickCircle, color: Colors.white, size: 20),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Apply & Personalize Feed',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCutoutCard({
+  Widget _buildGridCard({
     required CutoutType type,
     required String title,
     required String subtitle,
-    required String badge,
   }) {
     final isSelected = _selected == type;
     final isDark = widget.isDark;
+
+    final cardBg = isSelected
+        ? (isDark
+            ? AppColors.darkCard
+            : Colors.white)
+        : (isDark
+            ? AppColors.darkCard.withValues(alpha: 0.6)
+            : AppColors.pillBackground.withValues(alpha: 0.8));
+
+    final borderColor = isSelected
+        ? AppColors.primaryPurple
+        : (isDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : AppColors.borderLight.withValues(alpha: 0.6));
 
     return BouncingWrapper(
       lowerBound: 0.96,
@@ -231,93 +265,85 @@ class _CutoutSetupDialogState extends State<CutoutSetupDialog> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark
-                  ? AppColors.primaryPurple.withOpacity(0.18)
-                  : AppColors.primaryPurple.withOpacity(0.08))
-              : (isDark ? AppColors.darkCard : AppColors.pillBackground.withOpacity(0.7)),
-          borderRadius: BorderRadius.circular(20),
+          color: cardBg,
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: isSelected ? AppColors.primaryPurple : Colors.transparent,
-            width: 2,
+            color: borderColor,
+            width: isSelected ? 2 : 1,
           ),
+          boxShadow: [
+            if (isSelected)
+              BoxShadow(
+                color: AppColors.primaryPurple.withValues(alpha: isDark ? 0.3 : 0.15),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              )
+            else if (!isDark)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+          ],
         ),
-        child: Row(
+        child: Column(
           children: [
-            // Visual Phone Mockup Thumbnail with camera indicator
-            _buildPhoneMockup(type, isSelected),
-            const SizedBox(width: 16),
-
-            // Text Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : AppColors.textDark,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primaryPurple
-                              : (isDark
-                                  ? Colors.white.withOpacity(0.08)
-                                  : AppColors.primaryPurple.withOpacity(0.1)),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          badge,
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected
-                                ? Colors.white
-                                : (isDark ? Colors.white70 : AppColors.primaryPurple),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      color: AppColors.textMuted,
+            // Top Indicator (Checked or Placeholder)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(width: 18),
+                _buildPhoneMockup(type, isSelected),
+                Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isSelected ? AppColors.primaryPurple : Colors.transparent,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primaryPurple
+                          : (isDark ? Colors.white30 : AppColors.textMuted.withValues(alpha: 0.3)),
+                      width: 1.5,
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Selection Radio Indicator
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primaryPurple : AppColors.textMuted.withOpacity(0.4),
-                  width: 2,
+                  child: isSelected
+                      ? const Center(
+                          child: Icon(Icons.check, size: 12, color: Colors.white),
+                        )
+                      : null,
                 ),
-                color: isSelected ? AppColors.primaryPurple : Colors.transparent,
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Title
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isSelected
+                    ? AppColors.primaryPurple
+                    : (isDark ? Colors.white : AppColors.textDark),
               ),
-              child: isSelected
-                  ? const Center(
-                      child: Icon(Icons.check, size: 14, color: Colors.white),
-                    )
-                  : null,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+
+            // Subtitle
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                color: AppColors.textMuted,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -325,67 +351,59 @@ class _CutoutSetupDialogState extends State<CutoutSetupDialog> {
     );
   }
 
-  /// Stylized Mini Phone Mockup showing the physical cutout position
+  /// Stylized Mini Phone Mockup with precision physical cutout rendering
   Widget _buildPhoneMockup(CutoutType type, bool isSelected) {
     return Container(
-      width: 48,
-      height: 64,
+      width: 44,
+      height: 60,
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1016),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF13101C),
+        borderRadius: BorderRadius.circular(11),
         border: Border.all(
-          color: isSelected ? AppColors.primaryPurple : Colors.white.withOpacity(0.15),
-          width: 1.5,
+          color: isSelected
+              ? AppColors.primaryPurple.withValues(alpha: 0.7)
+              : Colors.white.withValues(alpha: 0.16),
+          width: 1.2,
         ),
-        boxShadow: [
-          if (isSelected)
-            BoxShadow(
-              color: AppColors.primaryPurple.withOpacity(0.3),
-              blurRadius: 10,
-            ),
-        ],
       ),
       child: Stack(
         children: [
-          // Screen interior glow
+          // Screen Interior with Vibrant Flows gradient
           Positioned.fill(
             child: Container(
               margin: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(9),
+                borderRadius: BorderRadius.circular(8),
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    type == CutoutType.universal
-                        ? Colors.black
-                        : const Color(0xFF1E1035),
-                    const Color(0xFF0A0714),
-                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isSelected
+                      ? const [Color(0xFF3B1E78), Color(0xFF18122B)]
+                      : const [Color(0xFF241A38), Color(0xFF110D1D)],
                 ),
               ),
             ),
           ),
 
-          // Camera Cutout Representation
+          // Physical Camera Cutouts
           if (type == CutoutType.centerHole)
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-                margin: const EdgeInsets.only(top: 6),
-                width: 7,
-                height: 7,
+                margin: const EdgeInsets.only(top: 5),
+                width: 6,
+                height: 6,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? const Color(0xFFFFB703) : Colors.white60,
-                    width: 1.2,
+                    color: isSelected ? AppColors.primaryPurple : Colors.white54,
+                    width: 1,
                   ),
                   boxShadow: [
                     if (isSelected)
-                      const BoxShadow(
-                        color: Color(0xFFFFB703),
+                      BoxShadow(
+                        color: AppColors.primaryPurple.withValues(alpha: 0.6),
                         blurRadius: 4,
                       ),
                   ],
@@ -396,20 +414,20 @@ class _CutoutSetupDialogState extends State<CutoutSetupDialog> {
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-                margin: const EdgeInsets.only(top: 6),
-                width: 18,
-                height: 6,
+                margin: const EdgeInsets.only(top: 5),
+                width: 16,
+                height: 5.5,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(3),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFFFF523B) : Colors.white60,
-                    width: 1.2,
+                    color: isSelected ? AppColors.accentCoral : Colors.white54,
+                    width: 1,
                   ),
                   boxShadow: [
                     if (isSelected)
-                      const BoxShadow(
-                        color: Color(0xFFFF523B),
+                      BoxShadow(
+                        color: AppColors.accentCoral.withValues(alpha: 0.6),
                         blurRadius: 4,
                       ),
                   ],
@@ -420,20 +438,20 @@ class _CutoutSetupDialogState extends State<CutoutSetupDialog> {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                margin: const EdgeInsets.only(top: 6, left: 6),
-                width: 7,
-                height: 7,
+                margin: const EdgeInsets.only(top: 5, left: 5),
+                width: 6,
+                height: 6,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF00E599) : Colors.white60,
-                    width: 1.2,
+                    color: isSelected ? AppColors.primaryPurple : Colors.white54,
+                    width: 1,
                   ),
                   boxShadow: [
                     if (isSelected)
-                      const BoxShadow(
-                        color: Color(0xFF00E599),
+                      BoxShadow(
+                        color: AppColors.primaryPurple.withValues(alpha: 0.6),
                         blurRadius: 4,
                       ),
                   ],
@@ -444,15 +462,15 @@ class _CutoutSetupDialogState extends State<CutoutSetupDialog> {
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-                height: 18,
+                height: 14,
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black,
-                      Colors.black.withOpacity(0.0),
+                      Colors.black.withValues(alpha: 0.85),
+                      Colors.transparent,
                     ],
                   ),
                 ),

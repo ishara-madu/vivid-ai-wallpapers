@@ -107,112 +107,68 @@ class _ExploreScreenState extends State<ExploreScreen> {
               AppTopBar(
                 title: 'Explore',
                 isDark: widget.isDark,
-              isSearching: _isSearching,
-              searchController: _searchController,
-              searchHint: 'Search notch wallpapers...',
-              onSearchSubmitted: (val) {
-                setState(() {
-                  _searchQuery = val.trim();
-                });
-              },
-              onToggleSearch: () {
-                setState(() {
-                  _isSearching = !_isSearching;
-                  if (!_isSearching) {
-                    _searchQuery = '';
-                    _searchController.clear();
-                  }
-                });
-              },
-              onOpenSettings: widget.onOpenSettings,
-            ).toSliver(),
-
-            // Cutout Device Bar (Shows active cutout + quick tap to change)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: BouncingWrapper(
-                  lowerBound: 0.96,
-                  onTap: widget.onOpenCutoutSelector,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: widget.isDark
-                          ? AppColors.darkCard
-                          : AppColors.pillBackground.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.primaryPurple.withOpacity(0.35),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
+                isSearching: _isSearching,
+                searchController: _searchController,
+                searchHint: 'Search notch wallpapers...',
+                onSearchSubmitted: (val) {
+                  setState(() {
+                    _searchQuery = val.trim();
+                  });
+                },
+                onToggleSearch: () {
+                  setState(() {
+                    _isSearching = !_isSearching;
+                    if (!_isSearching) {
+                      _searchQuery = '';
+                      _searchController.clear();
+                    }
+                  });
+                },
+                onOpenSettings: widget.onOpenSettings,
+                trailing: _isSearching
+                    ? null
+                    : BouncingWrapper(
+                        lowerBound: 0.92,
+                        onTap: widget.onOpenCutoutSelector,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryPurple.withOpacity(0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            AmazingIconOutlined.mobile,
-                            size: 14,
-                            color: AppColors.primaryPurple,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: widget.isDark ? Colors.white70 : AppColors.textDark,
-                              ),
-                              children: [
-                                const TextSpan(text: 'Tuned for: '),
-                                TextSpan(
-                                  text: widget.selectedCutout.displayName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primaryPurple,
-                                  ),
-                                ),
-                              ],
+                            color: widget.isDark
+                                ? AppColors.darkCard
+                                : AppColors.pillBackground,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: widget.isDark
+                                  ? Colors.white.withValues(alpha: 0.08)
+                                  : AppColors.borderLight,
+                              width: 1,
                             ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryPurple.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: AppColors.primaryGradient,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
                               Text(
-                                'Change',
+                                widget.selectedCutout.displayName,
                                 style: GoogleFonts.poppins(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryPurple,
+                                  color: widget.isDark ? Colors.white : AppColors.textDark,
                                 ),
-                              ),
-                              const SizedBox(width: 2),
-                              const Icon(
-                                AmazingIconOutlined.arrowRight2,
-                                size: 12,
-                                color: AppColors.primaryPurple,
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                      ),
+              ).toSliver(),
 
             // Offline Banner when data is off but previous wallpapers exist
             if (widget.isOffline && widget.wallpapers.isNotEmpty)
