@@ -132,16 +132,26 @@ class Wallpaper {
       return const {};
     }
 
+    String resolveUrl(String? raw) {
+      if (raw == null || raw.isEmpty) return '';
+      if (raw.startsWith('http://') || raw.startsWith('https://')) {
+        return raw;
+      }
+      final cleanPath = raw.startsWith('/') ? raw.substring(1) : raw;
+      return 'https://raw.githubusercontent.com/ishara-madu/vivid-ai-wallpapers/main/$cleanPath';
+    }
+
     final rawVariants = (json['variants'] as List<dynamic>?)
-            ?.map((e) => e.toString())
+            ?.map((e) => resolveUrl(e.toString()))
             .toList() ??
         const [];
-    final cutoutVariantsMap = parseCutoutVariants(json['cutoutVariants']);
+    final cutoutVariantsMap = parseCutoutVariants(json['cutoutVariants'])
+        .map((k, v) => MapEntry(k, resolveUrl(v)));
 
     return Wallpaper(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? 'Untitled',
-      imageUrl: json['imageUrl'] as String? ?? '',
+      imageUrl: resolveUrl(json['imageUrl'] as String?),
       category: json['category'] as String? ?? 'Creative Cutouts',
       cutoutType: CutoutType.fromString(json['cutoutType'] as String?),
       isMultivariant: (json['isMultivariant'] as bool? ?? false) ||
