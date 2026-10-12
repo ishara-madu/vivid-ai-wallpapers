@@ -82,9 +82,9 @@ class OfflineIndicator extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Title in Sinhala & English
+              // Title in English
               Text(
-                'දත්ත සම්බන්ධතාවය ක්‍රියා විරහිතයි',
+                'No Internet Connection',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 18,
@@ -92,24 +92,14 @@ class OfflineIndicator extends StatelessWidget {
                   color: textColor,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'No Internet Connection',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFFFF523B),
-                ),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // Description
               Text(
-                'Wallpapers ලබා ගැනීමට කරුණාකර ඔබගේ Mobile Data හෝ Wi-Fi On කර නැවත උත්සාහ කරන්න.\n\nPlease turn on Mobile Data or Wi-Fi to load wallpapers from the repository.',
+                'Please check your mobile data or Wi-Fi connection and tap below to retry.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  fontSize: 12,
+                  fontSize: 13,
                   height: 1.5,
                   color: mutedColor,
                 ),
@@ -158,12 +148,12 @@ class OfflineIndicator extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'නැවත උත්සාහ කරන්න (Retry)',
+                                'Try Again',
                                 style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                               ),
                             ],
                           ),

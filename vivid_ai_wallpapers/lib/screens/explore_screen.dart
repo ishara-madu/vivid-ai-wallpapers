@@ -239,7 +239,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'දත්ත සබඳතාව ක්‍රියා විරහිතයි (Data Off). අලුත් wallpapers බැලීමට Data On කරන්න.',
+                            'No internet connection. Turn on Mobile Data or Wi-Fi to load new wallpapers.',
                             style: GoogleFonts.poppins(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
@@ -305,7 +305,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             if (widget.wallpapers.isNotEmpty)
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-            // Body: Offline / Loading / Wallpapers Grid
+            // Body: Offline / Loading / Empty Catalog / Wallpapers Grid
             if (widget.isOffline && widget.wallpapers.isEmpty)
               SliverFillRemaining(
                 hasScrollBody: false,
@@ -332,7 +332,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                       const SizedBox(height: 18),
                       Text(
-                        'AI Wallpapers ලබාගනිමින් පවතී...',
+                        'Loading Wallpapers...',
                         style: GoogleFonts.poppins(
                           color: widget.isDark ? Colors.white : AppColors.textDark,
                           fontSize: 15,
@@ -351,17 +351,120 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                 ),
               )
+            else if (widget.wallpapers.isEmpty)
+              // Online, but repository catalog has no wallpapers yet
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: widget.isDark ? AppColors.darkCard : AppColors.pillBackground,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              AmazingIconOutlined.image,
+                              size: 40,
+                              color: AppColors.primaryPurple,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        Text(
+                          'No Wallpapers Found',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: widget.isDark ? Colors.white : AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'The wallpaper catalog is currently empty. Upload wallpapers via the Web Uploader to view them here.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            height: 1.5,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        BouncingWrapper(
+                          lowerBound: 0.94,
+                          onTap: widget.onRefresh,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  AmazingIconOutlined.refresh2,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Refresh Catalog',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
             else if (_filteredWallpapers.isEmpty)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(40),
-                  child: Center(
-                    child: Text(
-                      'No wallpapers found for this cutout style.',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.textMuted,
-                        fontSize: 14,
-                      ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          AmazingIconOutlined.searchNormal,
+                          size: 44,
+                          color: AppColors.textMuted.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No Wallpapers Found',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: widget.isDark ? Colors.white : AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'No wallpapers match "$_selectedCategory".',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

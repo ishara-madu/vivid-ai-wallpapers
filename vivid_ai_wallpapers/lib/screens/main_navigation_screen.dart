@@ -61,7 +61,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           _wallpapers = live;
           _collections = _buildCollectionsFromWallpapers(live);
           _isLoading = false;
-          _isOffline = live.isEmpty;
+          _isOffline = false;
         });
       }
     } catch (e) {
@@ -69,9 +69,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          if (_wallpapers.isEmpty) {
-            _isOffline = true;
-          }
+          _isOffline = true;
         });
       }
     }
