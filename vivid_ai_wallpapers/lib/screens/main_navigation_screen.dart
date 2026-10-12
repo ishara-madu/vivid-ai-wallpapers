@@ -282,6 +282,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 onOpenCutoutSelector: _promptCutoutSetup,
                 onToggleLike: _toggleLike,
                 onOpenSettings: _openSettingsSheet,
+                onRefresh: _loadLiveWallpapers,
                 isDark: widget.isDark,
               ),
               CollectionsScreen(

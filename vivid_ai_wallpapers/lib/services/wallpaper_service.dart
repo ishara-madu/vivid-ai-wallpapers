@@ -12,8 +12,10 @@ class WallpaperService {
   /// Falls back to SampleData on network error or offline.
   static Future<List<Wallpaper>> fetchLiveWallpapers() async {
     try {
+      // Add cache-buster timestamp to ensure GitHub CDN immediately delivers newly pushed wallpapers
+      final uri = Uri.parse('$catalogUrl?t=${DateTime.now().millisecondsSinceEpoch}');
       final response = await http
-          .get(Uri.parse(catalogUrl))
+          .get(uri)
           .timeout(const Duration(seconds: 8));
 
       if (response.statusCode == 200) {
@@ -31,15 +33,8 @@ class WallpaperService {
         }
 
         if (liveList.isNotEmpty) {
-          // Merge live items with sample items so all categories have content
-          final existingIds = liveList.map((w) => w.id).toSet();
-          final merged = List<Wallpaper>.from(liveList);
-          for (final sample in SampleData.wallpapers) {
-            if (!existingIds.contains(sample.id)) {
-              merged.add(sample);
-            }
-          }
-          return merged;
+          // Return live catalog directly from the repository
+          return liveList;
         }
       }
     } catch (e) {

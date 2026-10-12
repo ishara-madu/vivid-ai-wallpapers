@@ -16,6 +16,7 @@ class ExploreScreen extends StatefulWidget {
   final VoidCallback onOpenSettings;
   final CutoutType selectedCutout;
   final VoidCallback onOpenCutoutSelector;
+  final Future<void> Function()? onRefresh;
   final bool isDark;
 
   const ExploreScreen({
@@ -26,6 +27,7 @@ class ExploreScreen extends StatefulWidget {
     required this.onOpenSettings,
     required this.selectedCutout,
     required this.onOpenCutoutSelector,
+    this.onRefresh,
     this.isDark = false,
   });
 
@@ -101,13 +103,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
           : AppColors.backgroundLight,
       body: SafeArea(
         bottom: false,
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // Unified Top Bar
-            AppTopBar(
-              title: 'Explore',
-              isDark: widget.isDark,
+        child: RefreshIndicator(
+          color: AppColors.primaryPurple,
+          onRefresh: widget.onRefresh ?? () async {},
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            slivers: [
+              // Unified Top Bar
+              AppTopBar(
+                title: 'Explore',
+                isDark: widget.isDark,
               isSearching: _isSearching,
               searchController: _searchController,
               searchHint: 'Search notch wallpapers...',
@@ -304,6 +309,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
