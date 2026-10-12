@@ -685,7 +685,7 @@
         resolution: elements.inputResolution.value.trim() || '4K Ultra HD',
         dimensions: elements.inputDimensions.value.trim() || '1080 x 2400',
         uploadDate: todayFormatted,
-        description: elements.inputDescription.value.trim() || `Curated Ultra HD AMOLED wallpaper engineered for ${category} camera notch.`,
+        description: elements.inputDescription.value.trim() || `Curated Ultra HD ${category} wallpaper engineered for camera notch cutout.`,
         views: Math.floor(400 + Math.random() * 800),
         isLiked: false,
         aiEngine: 'Curated Artwork'
