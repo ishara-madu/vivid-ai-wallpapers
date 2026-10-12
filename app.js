@@ -64,6 +64,7 @@
     primaryColor: '#0F172A',
     secondaryColor: '#38BDF8',
     catalog: [],
+    selectedIds: new Set(),
     activeFilter: 'All',
     searchQuery: ''
   };
@@ -112,11 +113,17 @@
     statThumbSize: document.getElementById('stat-thumb-size'),
     statNotchName: document.getElementById('stat-notch-name'),
 
-    // Catalog View
+    // Catalog View & Batch Controls
     catalogGrid: document.getElementById('catalog-grid'),
     catalogEmpty: document.getElementById('catalog-empty-state'),
     catalogSearch: document.getElementById('catalog-search-input'),
     catalogFilterPills: document.querySelectorAll('.cat-pill'),
+    batchBar: document.getElementById('batch-action-bar'),
+    batchCountText: document.getElementById('batch-count-text'),
+    btnDeleteSelected: document.getElementById('btn-delete-selected'),
+    btnClearSelection: document.getElementById('btn-clear-selection'),
+    btnToggleSelectAll: document.getElementById('btn-toggle-select-all'),
+    btnToolbarSelectAll: document.getElementById('btn-toolbar-select-all'),
 
     // Settings View
     inputRepoOwner: document.getElementById('input-repo-owner'),
@@ -876,17 +883,35 @@
         renderCatalogGrid();
       });
     });
+
+    // Select All / Deselect All
+    if (elements.btnToolbarSelectAll) {
+      elements.btnToolbarSelectAll.addEventListener('click', toggleSelectAllVisible);
+    }
+    if (elements.btnToggleSelectAll) {
+      elements.btnToggleSelectAll.addEventListener('click', toggleSelectAllVisible);
+    }
+
+    // Clear Selection
+    if (elements.btnClearSelection) {
+      elements.btnClearSelection.addEventListener('click', () => {
+        state.selectedIds.clear();
+        updateBatchBar();
+        renderCatalogGrid();
+      });
+    }
+
+    // Batch Delete Button
+    if (elements.btnDeleteSelected) {
+      elements.btnDeleteSelected.addEventListener('click', batchDeleteWallpapers);
+    }
   }
 
-  function renderCatalogGrid() {
+  function getVisibleWallpapers() {
     let items = state.catalog;
-
-    // Filter by category
     if (state.activeFilter !== 'All') {
       items = items.filter(item => item.category === state.activeFilter);
     }
-
-    // Filter by search query
     if (state.searchQuery) {
       items = items.filter(item => {
         const title = (item.title || '').toLowerCase();
@@ -895,10 +920,51 @@
         return title.includes(state.searchQuery) || cat.includes(state.searchQuery) || id.includes(state.searchQuery);
       });
     }
+    return items;
+  }
+
+  function toggleSelectAllVisible() {
+    const visible = getVisibleWallpapers();
+    const visibleIds = visible.map(w => w.id);
+    const allSelected = visibleIds.length > 0 && visibleIds.every(id => state.selectedIds.has(id));
+
+    if (allSelected) {
+      visibleIds.forEach(id => state.selectedIds.delete(id));
+    } else {
+      visibleIds.forEach(id => state.selectedIds.add(id));
+    }
+
+    updateBatchBar();
+    renderCatalogGrid();
+  }
+
+  function updateBatchBar() {
+    const count = state.selectedIds.size;
+    if (!elements.batchBar) return;
+
+    if (count > 0) {
+      elements.batchBar.style.display = 'flex';
+      elements.batchCountText.textContent = `${count} wallpaper${count > 1 ? 's' : ''} marked`;
+      if (elements.btnToolbarSelectAll) {
+        const visible = getVisibleWallpapers();
+        const allSelected = visible.length > 0 && visible.every(w => state.selectedIds.has(w.id));
+        elements.btnToolbarSelectAll.textContent = allSelected ? 'Deselect All' : 'Select All';
+      }
+    } else {
+      elements.batchBar.style.display = 'none';
+      if (elements.btnToolbarSelectAll) {
+        elements.btnToolbarSelectAll.textContent = 'Select All';
+      }
+    }
+  }
+
+  function renderCatalogGrid() {
+    const items = getVisibleWallpapers();
 
     if (items.length === 0) {
       elements.catalogGrid.innerHTML = '';
       elements.catalogEmpty.style.display = 'flex';
+      updateBatchBar();
       return;
     }
 
@@ -907,12 +973,16 @@
     elements.catalogGrid.innerHTML = items.map(item => {
       const thumbUrl = item.thumbnailUrl || item.imageUrl;
       const gradColors = item.gradientFallback || ['#0F172A', '#38BDF8'];
+      const isSelected = state.selectedIds.has(item.id);
 
       return `
-        <div class="wallpaper-card" data-id="${escapeHtml(item.id)}">
+        <div class="wallpaper-card ${isSelected ? 'is-selected' : ''}" data-id="${escapeHtml(item.id)}">
+          <div class="card-select-wrap">
+            <input type="checkbox" class="card-checkbox" data-id="${escapeHtml(item.id)}" ${isSelected ? 'checked' : ''} title="Mark wallpaper">
+          </div>
           <div class="card-thumb-wrap">
             <img class="card-thumb-img" src="${escapeHtml(thumbUrl)}" loading="lazy" alt="${escapeHtml(item.title)}">
-            <span class="card-badge">${escapeHtml(item.category)}</span>
+            <span class="card-badge" style="left: 36px;">${escapeHtml(item.category)}</span>
             <div class="card-actions-overlay">
               <button class="card-action-btn btn-delete-wp" data-id="${escapeHtml(item.id)}" title="Delete Wallpaper">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -936,7 +1006,47 @@
       `;
     }).join('');
 
-    // Attach Delete Listeners
+    // Attach Card Selection & Checkbox Listeners
+    elements.catalogGrid.querySelectorAll('.wallpaper-card').forEach(card => {
+      card.addEventListener('click', e => {
+        // If clicking delete button, don't toggle selection
+        if (e.target.closest('.btn-delete-wp')) return;
+
+        const id = card.dataset.id;
+        const checkbox = card.querySelector('.card-checkbox');
+
+        if (state.selectedIds.has(id)) {
+          state.selectedIds.delete(id);
+          card.classList.remove('is-selected');
+          if (checkbox) checkbox.checked = false;
+        } else {
+          state.selectedIds.add(id);
+          card.classList.add('is-selected');
+          if (checkbox) checkbox.checked = true;
+        }
+
+        updateBatchBar();
+      });
+    });
+
+    // Checkbox click listener
+    elements.catalogGrid.querySelectorAll('.card-checkbox').forEach(cb => {
+      cb.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = cb.dataset.id;
+        const card = cb.closest('.wallpaper-card');
+        if (cb.checked) {
+          state.selectedIds.add(id);
+          if (card) card.classList.add('is-selected');
+        } else {
+          state.selectedIds.delete(id);
+          if (card) card.classList.remove('is-selected');
+        }
+        updateBatchBar();
+      });
+    });
+
+    // Attach Single Delete Listeners
     elements.catalogGrid.querySelectorAll('.btn-delete-wp').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -944,11 +1054,60 @@
         deleteWallpaperFromCatalog(id);
       });
     });
+
+    updateBatchBar();
+  }
+
+  async function batchDeleteWallpapers() {
+    if (!state.token) {
+      showToast('GitHub token required to delete wallpapers', 'error');
+      const settingsTab = document.getElementById('tab-settings');
+      if (settingsTab) settingsTab.click();
+      return;
+    }
+
+    const count = state.selectedIds.size;
+    if (count === 0) {
+      showToast('No wallpapers marked to delete', 'info');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to permanently remove ${count} marked wallpaper${count > 1 ? 's' : ''} from catalog.json?`)) {
+      return;
+    }
+
+    showToast(`Removing ${count} wallpapers from catalog...`, 'info');
+
+    try {
+      const catalogPath = 'wallpapers/metadata/catalog.json';
+      const fileData = await fetchFileFromGithub(catalogPath);
+      if (!fileData) throw new Error('Could not fetch catalog.json from GitHub');
+
+      const currentCatalog = JSON.parse(base64ToUtf8(fileData.content));
+      const updated = currentCatalog.filter(w => !state.selectedIds.has(w.id));
+
+      const jsonStr = JSON.stringify(updated, null, 2);
+      const base64 = utf8ToBase64(jsonStr);
+
+      await commitFileToGithub(catalogPath, base64, `Batch remove ${count} wallpapers from catalog`, fileData.sha);
+
+      state.catalog = updated;
+      state.selectedIds.clear();
+      elements.catalogBadge.textContent = state.catalog.length;
+
+      updateBatchBar();
+      renderCatalogGrid();
+      showToast(`Successfully removed ${count} wallpaper${count > 1 ? 's' : ''}!`, 'success');
+    } catch (err) {
+      showToast(`Failed to delete: ${err.message}`, 'error');
+    }
   }
 
   async function deleteWallpaperFromCatalog(id) {
     if (!state.token) {
       showToast('GitHub token required to delete wallpapers', 'error');
+      const settingsTab = document.getElementById('tab-settings');
+      if (settingsTab) settingsTab.click();
       return;
     }
 
@@ -975,7 +1134,10 @@
       await commitFileToGithub(catalogPath, base64, `Remove wallpaper: ${title} (${id})`, fileData.sha);
 
       state.catalog = updated;
+      state.selectedIds.delete(id);
       elements.catalogBadge.textContent = state.catalog.length;
+
+      updateBatchBar();
       renderCatalogGrid();
       showToast(`Removed "${title}" successfully`, 'success');
     } catch (err) {

@@ -272,6 +272,25 @@
             <button class="cat-pill" data-filter="Left Corner">Left Corner</button>
             <button class="cat-pill" data-filter="Creative Cutouts">Creative Cutouts</button>
             <button class="cat-pill" data-filter="AMOLED Stealth">AMOLED Stealth</button>
+            <button type="button" class="cat-pill" id="btn-toolbar-select-all" style="margin-left: auto;">Select All</button>
+          </div>
+        </div>
+
+        <!-- Floating / Sticky Batch Action Bar -->
+        <div class="batch-bar" id="batch-action-bar" style="display: none;">
+          <div class="batch-info">
+            <span id="batch-count-text">0 wallpapers selected</span>
+          </div>
+          <div class="batch-actions-group">
+            <button type="button" class="btn-subtle" id="btn-toggle-select-all">Select All</button>
+            <button type="button" class="btn-subtle" id="btn-clear-selection">Clear</button>
+            <button type="button" class="btn-danger" id="btn-delete-selected">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Delete Selected
+            </button>
           </div>
         </div>
 
