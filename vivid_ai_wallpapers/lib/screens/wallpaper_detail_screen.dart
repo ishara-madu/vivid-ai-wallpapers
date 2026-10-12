@@ -457,7 +457,7 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Target: ${_currentWallpaper.cutoutType.displayName}',
+                          '${_currentWallpaper.category}  •  Target: ${_currentWallpaper.cutoutType.displayName}',
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,

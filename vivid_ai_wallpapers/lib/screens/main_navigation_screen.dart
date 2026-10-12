@@ -80,23 +80,50 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   List<WallpaperCollection> _buildCollectionsFromWallpapers(List<Wallpaper> list) {
     if (list.isEmpty) return [];
 
+    final collections = <WallpaperCollection>[];
+
+    // 1. Artistic Category Collections (e.g. Cyberpunk, Anime, Abstract, etc.)
+    final categoryGroups = <String, List<Wallpaper>>{};
+    for (final w in list) {
+      if (w.category.isNotEmpty) {
+        categoryGroups.putIfAbsent(w.category, () => []).add(w);
+      }
+    }
+
+    for (final entry in categoryGroups.entries) {
+      final catWallpapers = entry.value;
+      final cover = catWallpapers.first;
+      final coverUrl = cover.thumbnailUrl.isNotEmpty ? cover.thumbnailUrl : cover.imageUrl;
+      collections.add(
+        WallpaperCollection(
+          id: 'cat_${entry.key.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '_')}',
+          title: entry.key,
+          subtitle: '${catWallpapers.length} ultra HD artworks in ${entry.key}',
+          wallpaperCount: catWallpapers.length,
+          coverImageUrl: coverUrl,
+          gradientColors: cover.gradientFallback,
+          isDarkTheme: true,
+          wallpapers: catWallpapers,
+        ),
+      );
+    }
+
+    // 2. Hardware Notch-Specific Collections
     final centerHole = list.where((w) => w.cutoutType == CutoutType.centerHole).toList();
     final dynamicIsland = list.where((w) => w.cutoutType == CutoutType.dynamicIsland).toList();
     final amoled = list.where((w) => w.cutoutType == CutoutType.universal).toList();
     final leftCorner = list.where((w) => w.cutoutType == CutoutType.leftHole).toList();
-    final creative = list.where((w) => w.category == 'Creative Cutouts').toList();
 
-    final collections = <WallpaperCollection>[];
-
-    if (centerHole.isNotEmpty) {
+    if (centerHole.isNotEmpty && !categoryGroups.containsKey('Center Hole')) {
+      final cover = centerHole.first;
       collections.add(
         WallpaperCollection(
           id: 'c_center',
           title: 'Punch-Hole Cosmic Halos',
           subtitle: 'Astral rings & solar eclipses framing the center camera',
           wallpaperCount: centerHole.length,
-          coverImageUrl: centerHole.first.imageUrl,
-          gradientColors: centerHole.first.gradientFallback,
+          coverImageUrl: cover.thumbnailUrl.isNotEmpty ? cover.thumbnailUrl : cover.imageUrl,
+          gradientColors: cover.gradientFallback,
           isDarkTheme: true,
           wallpapers: centerHole,
         ),
@@ -104,57 +131,47 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     if (dynamicIsland.isNotEmpty) {
+      final cover = dynamicIsland.first;
       collections.add(
         WallpaperCollection(
           id: 'c_island',
           title: 'Dynamic Island Synthetics',
           subtitle: 'Capsule flows & acoustic waves for Dynamic Island',
           wallpaperCount: dynamicIsland.length,
-          coverImageUrl: dynamicIsland.first.imageUrl,
-          gradientColors: dynamicIsland.first.gradientFallback,
+          coverImageUrl: cover.thumbnailUrl.isNotEmpty ? cover.thumbnailUrl : cover.imageUrl,
+          gradientColors: cover.gradientFallback,
           isDarkTheme: true,
           wallpapers: dynamicIsland,
         ),
       );
     }
 
-    if (amoled.isNotEmpty) {
+    if (amoled.isNotEmpty && !categoryGroups.containsKey('AMOLED & Stealth')) {
+      final cover = amoled.first;
       collections.add(
         WallpaperCollection(
           id: 'c_amoled',
           title: 'Pure OLED Stealth Voids',
           subtitle: 'True-black gradients fading camera cutouts into invisibility',
           wallpaperCount: amoled.length,
-          coverImageUrl: amoled.first.imageUrl,
-          gradientColors: amoled.first.gradientFallback,
+          coverImageUrl: cover.thumbnailUrl.isNotEmpty ? cover.thumbnailUrl : cover.imageUrl,
+          gradientColors: cover.gradientFallback,
           isDarkTheme: true,
           wallpapers: amoled,
         ),
       );
     }
 
-    if (creative.isNotEmpty) {
-      collections.add(
-        WallpaperCollection(
-          id: 'c_creative',
-          title: 'Creative Cutout Characters',
-          subtitle: 'Whimsical astronaut and cat bezel interactions',
-          wallpaperCount: creative.length,
-          coverImageUrl: creative.first.imageUrl,
-          gradientColors: creative.first.gradientFallback,
-          isDarkTheme: true,
-          wallpapers: creative,
-        ),
-      );
-    } else if (leftCorner.isNotEmpty) {
+    if (leftCorner.isNotEmpty) {
+      final cover = leftCorner.first;
       collections.add(
         WallpaperCollection(
           id: 'c_left',
           title: 'Corner Lightning & Novas',
           subtitle: 'Electric plasma arcs originating from corner punch-holes',
           wallpaperCount: leftCorner.length,
-          coverImageUrl: leftCorner.first.imageUrl,
-          gradientColors: leftCorner.first.gradientFallback,
+          coverImageUrl: cover.thumbnailUrl.isNotEmpty ? cover.thumbnailUrl : cover.imageUrl,
+          gradientColors: cover.gradientFallback,
           isDarkTheme: true,
           wallpapers: leftCorner,
         ),

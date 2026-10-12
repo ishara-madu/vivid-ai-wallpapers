@@ -51,7 +51,9 @@ class WallpaperCard extends StatelessWidget {
                 ),
               ),
               child: Image.network(
-                wallpaper.imageUrl,
+                wallpaper.thumbnailUrl.isNotEmpty
+                    ? wallpaper.thumbnailUrl
+                    : wallpaper.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(

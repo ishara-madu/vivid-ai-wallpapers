@@ -34,6 +34,7 @@ class Wallpaper {
   final String id;
   final String title;
   final String imageUrl;
+  final String thumbnailUrl;
   final String category;
   final CutoutType cutoutType;
   final bool isMultivariant;
@@ -52,6 +53,7 @@ class Wallpaper {
     required this.id,
     required this.title,
     required this.imageUrl,
+    this.thumbnailUrl = '',
     required this.category,
     this.cutoutType = CutoutType.centerHole,
     this.isMultivariant = false,
@@ -71,6 +73,7 @@ class Wallpaper {
     String? id,
     String? title,
     String? imageUrl,
+    String? thumbnailUrl,
     String? category,
     CutoutType? cutoutType,
     bool? isMultivariant,
@@ -89,6 +92,7 @@ class Wallpaper {
       id: id ?? this.id,
       title: title ?? this.title,
       imageUrl: imageUrl ?? this.imageUrl,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       category: category ?? this.category,
       cutoutType: cutoutType ?? this.cutoutType,
       isMultivariant: isMultivariant ?? this.isMultivariant,
@@ -152,6 +156,7 @@ class Wallpaper {
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? 'Untitled',
       imageUrl: resolveUrl(json['imageUrl'] as String?),
+      thumbnailUrl: resolveUrl(json['thumbnailUrl'] as String?),
       category: json['category'] as String? ?? 'Creative Cutouts',
       cutoutType: CutoutType.fromString(json['cutoutType'] as String?),
       isMultivariant: (json['isMultivariant'] as bool? ?? false) ||
@@ -175,6 +180,7 @@ class Wallpaper {
       'id': id,
       'title': title,
       'imageUrl': imageUrl,
+      'thumbnailUrl': thumbnailUrl,
       'category': category,
       'cutoutType': cutoutType.name,
       'isMultivariant': isMultivariant,
